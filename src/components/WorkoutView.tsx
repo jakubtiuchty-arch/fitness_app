@@ -61,7 +61,6 @@ export function WorkoutView({ workoutType, onBack, onComplete }: WorkoutViewProp
     return (
       <AerobyView
         onBack={onBack}
-        onComplete={onComplete}
         activeSession={activeSession}
         onStart={handleStart}
         onFinish={handleFinish}

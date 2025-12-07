@@ -1,5 +1,6 @@
 import { X, Trophy, Clock, Flame, TrendingUp } from 'lucide-react';
 import { useWorkoutStore } from '../store/workoutStore';
+import { Achievements } from './Achievements';
 
 interface StatsModalProps {
   onClose: () => void;
@@ -102,6 +103,8 @@ export function StatsModal({ onClose }: StatsModalProps) {
             </div>
           </div>
         )}
+
+        <Achievements />
       </div>
     </div>
   );

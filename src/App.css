@@ -1141,3 +1141,314 @@
   color: var(--text-muted);
   margin: 0.25rem 0;
 }
+
+/* Rest Timer */
+.rest-timer-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+}
+
+.rest-timer-modal {
+  background-color: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 320px;
+  text-align: center;
+}
+
+.rest-timer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.rest-timer-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.rest-timer-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.timer-icon-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.timer-icon-btn:hover {
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+}
+
+.rest-timer-display {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 1.5rem;
+}
+
+.timer-circle {
+  width: 100%;
+  height: 100%;
+}
+
+.timer-circle-bg {
+  color: var(--bg-dark);
+}
+
+.timer-circle-progress {
+  color: var(--primary);
+  transition: stroke-dashoffset 0.3s ease;
+}
+
+.timer-time {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.rest-timer-presets {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.preset-btn {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-dark);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.preset-btn:hover {
+  background-color: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+.preset-btn.active {
+  background-color: var(--primary);
+  color: white;
+}
+
+.rest-timer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.timer-action-btn {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--bg-dark);
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.timer-action-btn:hover {
+  background-color: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+.timer-action-btn.primary {
+  width: 64px;
+  height: 64px;
+  background-color: var(--primary);
+  color: white;
+}
+
+.timer-action-btn.primary:hover {
+  background-color: var(--primary-dark);
+}
+
+.timer-action-btn.skip {
+  width: auto;
+  height: auto;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+}
+
+.timer-complete {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: rgba(34, 197, 94, 0.2);
+  border-radius: var(--radius-sm);
+  color: var(--success);
+  font-weight: 600;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Achievements/Badges */
+.achievements-section {
+  padding: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.achievements-section h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.achievement-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem;
+  background-color: var(--bg-dark);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.achievement-card.unlocked {
+  background-color: rgba(251, 191, 36, 0.1);
+}
+
+.achievement-card.locked {
+  opacity: 0.5;
+}
+
+.achievement-icon {
+  font-size: 1.75rem;
+  margin-bottom: 0.375rem;
+}
+
+.achievement-card.locked .achievement-icon {
+  filter: grayscale(1);
+}
+
+.achievement-name {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.achievement-card.locked .achievement-name {
+  color: var(--text-muted);
+}
+
+/* Interval Timer for Aeroby */
+.interval-timer {
+  background-color: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin: 1rem;
+  text-align: center;
+}
+
+.interval-timer-phase {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+
+.interval-timer-phase.run {
+  color: var(--danger);
+}
+
+.interval-timer-phase.walk {
+  color: var(--success);
+}
+
+.interval-timer-time {
+  font-size: 4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.interval-timer-round {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.interval-timer-progress {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.interval-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--bg-dark);
+}
+
+.interval-dot.completed {
+  background-color: var(--success);
+}
+
+.interval-dot.current {
+  background-color: var(--primary);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.interval-timer-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.steady-cardio-info {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.steady-cardio-info p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0.25rem 0;
+}

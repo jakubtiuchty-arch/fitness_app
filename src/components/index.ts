@@ -7,3 +7,6 @@ export { AerobyView } from './AerobyView';
 export { StatsModal } from './StatsModal';
 export { SettingsModal } from './SettingsModal';
 export { GoogleFitButton } from './GoogleFitButton';
+export { RestTimer } from './RestTimer';
+export { Achievements } from './Achievements';
+export { IntervalTimer } from './IntervalTimer';
