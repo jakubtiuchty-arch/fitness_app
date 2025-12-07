@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Header,
   WeekSelector,
@@ -17,8 +17,10 @@ function App() {
   const {
     schedule,
     currentWeek,
+    currentDay,
     setCurrentWeek,
-    markDayCompleted
+    markDayCompleted,
+    syncWeekWithDate
   } = useWorkoutStore();
 
   const [view, setView] = useState<View>('schedule');
@@ -30,8 +32,10 @@ function App() {
   const [showStats, setShowStats] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
-  const today = new Date();
-  const todayDayIndex = today.getDay() === 0 ? 6 : today.getDay() - 1;
+  // Sync week with current date on app load
+  useEffect(() => {
+    syncWeekWithDate();
+  }, [syncWeekWithDate]);
 
   const handleStartWorkout = (weekIndex: number, dayIndex: number, type: WorkoutType) => {
     setSelectedWorkout({ type, weekIndex, dayIndex });
@@ -89,7 +93,7 @@ function App() {
             <DayCard
               key={`${currentWeek}-${dayIndex}`}
               day={day}
-              isToday={currentWeek === 0 && dayIndex === todayDayIndex}
+              isToday={dayIndex === currentDay}
               onStartWorkout={() => handleStartWorkout(currentWeek, dayIndex, day.workoutType)}
               onViewWorkout={() => handleViewWorkout(currentWeek, dayIndex, day.workoutType)}
             />

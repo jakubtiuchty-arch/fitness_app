@@ -11,11 +11,35 @@ import type {
 } from '../types';
 import { generateMonthSchedule } from '../data/schedule';
 
+// Helper to get Monday of current week
+function getMonday(date: Date): Date {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  d.setDate(diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+// Calculate which week of the plan we're in
+function calculateCurrentWeek(planStartDate: string | null): number {
+  if (!planStartDate) return 0;
+
+  const start = getMonday(new Date(planStartDate));
+  const now = getMonday(new Date());
+  const diffTime = now.getTime() - start.getTime();
+  const diffWeeks = Math.floor(diffTime / (7 * 24 * 60 * 60 * 1000));
+
+  // Keep within 0-3 range (4 weeks), cycle if needed
+  return Math.max(0, Math.min(3, diffWeeks % 4));
+}
+
 interface WorkoutStore {
   // Schedule
   schedule: WeekSchedule[];
   currentWeek: number;
   currentDay: number;
+  planStartDate: string | null;
 
   // Active session
   activeSession: WorkoutSession | null;
@@ -33,6 +57,7 @@ interface WorkoutStore {
   initializeSchedule: () => void;
   setCurrentWeek: (week: number) => void;
   markDayCompleted: (weekIndex: number, dayIndex: number) => void;
+  syncWeekWithDate: () => void;
 
   // Actions - Session
   startSession: (workoutType: WorkoutType) => void;
@@ -59,6 +84,7 @@ export const useWorkoutStore = create<WorkoutStore>()(
       schedule: generateMonthSchedule(),
       currentWeek: 0,
       currentDay: new Date().getDay() === 0 ? 6 : new Date().getDay() - 1,
+      planStartDate: null,
       activeSession: null,
       completedSessions: [],
       stats: {
@@ -78,6 +104,21 @@ export const useWorkoutStore = create<WorkoutStore>()(
 
       setCurrentWeek: (week: number) => {
         set({ currentWeek: week });
+      },
+
+      syncWeekWithDate: () => {
+        let { planStartDate } = get();
+
+        // If no start date, set it to this Monday (plan starts now)
+        if (!planStartDate) {
+          const monday = getMonday(new Date());
+          planStartDate = monday.toISOString();
+          set({ planStartDate });
+        }
+
+        const currentWeek = calculateCurrentWeek(planStartDate);
+        const currentDay = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+        set({ currentWeek, currentDay });
       },
 
       markDayCompleted: (weekIndex: number, dayIndex: number) => {
@@ -282,8 +323,11 @@ export const useWorkoutStore = create<WorkoutStore>()(
 
       // Utility
       resetProgress: () => {
+        const monday = getMonday(new Date());
         set({
           schedule: generateMonthSchedule(),
+          planStartDate: monday.toISOString(),
+          currentWeek: 0,
           activeSession: null,
           completedSessions: [],
           stats: {
