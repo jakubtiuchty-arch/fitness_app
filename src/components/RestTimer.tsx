@@ -56,6 +56,10 @@ export function RestTimer({ defaultTime, onClose, autoStart = true }: RestTimerP
             setIsRunning(false);
             playSound();
             vibrate();
+            // Auto-close after 1.5 seconds
+            setTimeout(() => {
+              onClose();
+            }, 1500);
             return 0;
           }
           // Play tick sound at 3, 2, 1
@@ -70,7 +74,7 @@ export function RestTimer({ defaultTime, onClose, autoStart = true }: RestTimerP
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isRunning, timeLeft, playSound, vibrate]);
+  }, [isRunning, timeLeft, playSound, vibrate, onClose]);
 
   const handleReset = () => {
     setTimeLeft(selectedTime);
