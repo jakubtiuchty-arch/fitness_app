@@ -1,120 +1,146 @@
+import { useState } from 'react';
 import { X, Trash2, CloudOff, Check, RotateCcw } from 'lucide-react';
 import { useWorkoutStore } from '../store/workoutStore';
 import { GoogleFitButton } from './GoogleFitButton';
+import { ConfirmModal } from './ConfirmModal';
 
 interface SettingsModalProps {
   onClose: () => void;
 }
 
+type ConfirmAction = 'resetProgress' | 'resetWeek' | null;
+
 export function SettingsModal({ onClose }: SettingsModalProps) {
   const { googleFit, resetProgress, resetWeekCounter, disconnectGoogleFit, currentWeek, planStartDate } = useWorkoutStore();
+  const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
 
-  const handleResetProgress = () => {
-    if (window.confirm('Czy na pewno chcesz zresetować cały postęp? Ta operacja jest nieodwracalna.')) {
+  const handleConfirm = () => {
+    if (confirmAction === 'resetProgress') {
       resetProgress();
       onClose();
-    }
-  };
-
-  const handleResetWeekCounter = () => {
-    if (window.confirm('Zresetować licznik tygodni? Ten tydzień stanie się Tygodniem 1.')) {
+    } else if (confirmAction === 'resetWeek') {
       resetWeekCounter();
     }
+    setConfirmAction(null);
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content settings-modal" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>Ustawienia</h2>
-          <button className="close-button" onClick={onClose}>
-            <X size={24} />
-          </button>
-        </div>
-
-        <div className="settings-section">
-          <h3>Google Fit</h3>
-          <p className="settings-description">
-            Połącz z Google Fit, aby automatycznie synchronizować swoje treningi.
-          </p>
-
-          <div className="google-fit-status">
-            {googleFit.isConnected ? (
-              <div className="connected-status">
-                <div className="status-badge success">
-                  <Check size={16} />
-                  <span>Połączono</span>
-                </div>
-                {googleFit.lastSync && (
-                  <p className="last-sync">
-                    Ostatnia synchronizacja: {new Date(googleFit.lastSync).toLocaleString('pl-PL')}
-                  </p>
-                )}
-                <button className="disconnect-button" onClick={disconnectGoogleFit}>
-                  <CloudOff size={18} />
-                  <span>Rozłącz</span>
-                </button>
-              </div>
-            ) : (
-              <GoogleFitButton />
-            )}
-          </div>
-        </div>
-
-        <div className="settings-section">
-          <h3>Plan treningowy</h3>
-          <p className="settings-description">
-            Aktualnie używasz planu "Full Body + Aeroby - 1 miesiąc".
-          </p>
-          <div className="plan-info">
-            <div className="plan-item">
-              <span>Trening A:</span>
-              <span>Siła i baza (6 ćwiczeń)</span>
-            </div>
-            <div className="plan-item">
-              <span>Trening B:</span>
-              <span>Hipertrofia i detal (6 ćwiczeń)</span>
-            </div>
-            <div className="plan-item">
-              <span>Aeroby:</span>
-              <span>Interwały lub stałe tempo</span>
-            </div>
-          </div>
-
-          <div className="week-counter-section">
-            <div className="plan-item">
-              <span>Aktualny tydzień:</span>
-              <span>Tydzień {currentWeek + 1}</span>
-            </div>
-            {planStartDate && (
-              <div className="plan-item">
-                <span>Start planu:</span>
-                <span>{new Date(planStartDate).toLocaleDateString('pl-PL')}</span>
-              </div>
-            )}
-            <button className="reset-week-button" onClick={handleResetWeekCounter}>
-              <RotateCcw size={16} />
-              <span>Resetuj licznik tygodni</span>
+    <>
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content settings-modal" onClick={e => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>Ustawienia</h2>
+            <button className="close-button" onClick={onClose}>
+              <X size={24} />
             </button>
           </div>
-        </div>
 
-        <div className="settings-section danger">
-          <h3>Strefa niebezpieczna</h3>
-          <p className="settings-description">
-            Zresetuj cały postęp i zacznij od nowa.
-          </p>
-          <button className="danger-button" onClick={handleResetProgress}>
-            <Trash2 size={18} />
-            <span>Resetuj postęp</span>
-          </button>
-        </div>
+          <div className="settings-section">
+            <h3>Google Fit</h3>
+            <p className="settings-description">
+              Połącz z Google Fit, aby automatycznie synchronizować swoje treningi.
+            </p>
 
-        <div className="settings-footer">
-          <p>FitTrack v1.0.0</p>
-          <p>Stworzono z myślą o Twoich celach</p>
+            <div className="google-fit-status">
+              {googleFit.isConnected ? (
+                <div className="connected-status">
+                  <div className="status-badge success">
+                    <Check size={16} />
+                    <span>Połączono</span>
+                  </div>
+                  {googleFit.lastSync && (
+                    <p className="last-sync">
+                      Ostatnia synchronizacja: {new Date(googleFit.lastSync).toLocaleString('pl-PL')}
+                    </p>
+                  )}
+                  <button className="disconnect-button" onClick={disconnectGoogleFit}>
+                    <CloudOff size={18} />
+                    <span>Rozłącz</span>
+                  </button>
+                </div>
+              ) : (
+                <GoogleFitButton />
+              )}
+            </div>
+          </div>
+
+          <div className="settings-section">
+            <h3>Plan treningowy</h3>
+            <p className="settings-description">
+              Aktualnie używasz planu "Full Body + Aeroby - 1 miesiąc".
+            </p>
+            <div className="plan-info">
+              <div className="plan-item">
+                <span>Trening A:</span>
+                <span>Siła i baza (6 ćwiczeń)</span>
+              </div>
+              <div className="plan-item">
+                <span>Trening B:</span>
+                <span>Hipertrofia i detal (6 ćwiczeń)</span>
+              </div>
+              <div className="plan-item">
+                <span>Aeroby:</span>
+                <span>Interwały lub stałe tempo</span>
+              </div>
+            </div>
+
+            <div className="week-counter-section">
+              <div className="plan-item">
+                <span>Aktualny tydzień:</span>
+                <span>Tydzień {currentWeek + 1}</span>
+              </div>
+              {planStartDate && (
+                <div className="plan-item">
+                  <span>Start planu:</span>
+                  <span>{new Date(planStartDate).toLocaleDateString('pl-PL')}</span>
+                </div>
+              )}
+              <button className="reset-week-button" onClick={() => setConfirmAction('resetWeek')}>
+                <RotateCcw size={16} />
+                <span>Resetuj licznik tygodni</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="settings-section danger">
+            <h3>Strefa niebezpieczna</h3>
+            <p className="settings-description">
+              Zresetuj cały postęp i zacznij od nowa.
+            </p>
+            <button className="danger-button" onClick={() => setConfirmAction('resetProgress')}>
+              <Trash2 size={18} />
+              <span>Resetuj postęp</span>
+            </button>
+          </div>
+
+          <div className="settings-footer">
+            <p>FitTrack v1.0.0</p>
+            <p>Stworzono z myślą o Twoich celach</p>
+          </div>
         </div>
       </div>
-    </div>
+
+      <ConfirmModal
+        isOpen={confirmAction === 'resetWeek'}
+        title="Resetuj licznik tygodni"
+        message="Ten tydzień stanie się Tygodniem 1. Twoje statystyki i historia treningów pozostaną nienaruszone."
+        confirmText="Resetuj"
+        cancelText="Anuluj"
+        variant="warning"
+        onConfirm={handleConfirm}
+        onCancel={() => setConfirmAction(null)}
+      />
+
+      <ConfirmModal
+        isOpen={confirmAction === 'resetProgress'}
+        title="Resetuj cały postęp"
+        message="Czy na pewno chcesz zresetować cały postęp? Ta operacja jest nieodwracalna. Wszystkie statystyki, historia treningów i ustawienia zostaną usunięte."
+        confirmText="Tak, resetuj wszystko"
+        cancelText="Anuluj"
+        variant="danger"
+        onConfirm={handleConfirm}
+        onCancel={() => setConfirmAction(null)}
+      />
+    </>
   );
 }

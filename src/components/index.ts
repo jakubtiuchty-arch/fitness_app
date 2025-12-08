@@ -10,3 +10,4 @@ export { GoogleFitButton } from './GoogleFitButton';
 export { RestTimer } from './RestTimer';
 export { Achievements } from './Achievements';
 export { IntervalTimer } from './IntervalTimer';
+export { ConfirmModal } from './ConfirmModal';
