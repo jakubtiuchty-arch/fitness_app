@@ -1,4 +1,4 @@
-import { X, Trash2, CloudOff, Check } from 'lucide-react';
+import { X, Trash2, CloudOff, Check, RotateCcw } from 'lucide-react';
 import { useWorkoutStore } from '../store/workoutStore';
 import { GoogleFitButton } from './GoogleFitButton';
 
@@ -7,12 +7,18 @@ interface SettingsModalProps {
 }
 
 export function SettingsModal({ onClose }: SettingsModalProps) {
-  const { googleFit, resetProgress, disconnectGoogleFit } = useWorkoutStore();
+  const { googleFit, resetProgress, resetWeekCounter, disconnectGoogleFit, currentWeek, planStartDate } = useWorkoutStore();
 
   const handleResetProgress = () => {
     if (window.confirm('Czy na pewno chcesz zresetować cały postęp? Ta operacja jest nieodwracalna.')) {
       resetProgress();
       onClose();
+    }
+  };
+
+  const handleResetWeekCounter = () => {
+    if (window.confirm('Zresetować licznik tygodni? Ten tydzień stanie się Tygodniem 1.')) {
+      resetWeekCounter();
     }
   };
 
@@ -73,6 +79,23 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
               <span>Aeroby:</span>
               <span>Interwały lub stałe tempo</span>
             </div>
+          </div>
+
+          <div className="week-counter-section">
+            <div className="plan-item">
+              <span>Aktualny tydzień:</span>
+              <span>Tydzień {currentWeek + 1}</span>
+            </div>
+            {planStartDate && (
+              <div className="plan-item">
+                <span>Start planu:</span>
+                <span>{new Date(planStartDate).toLocaleDateString('pl-PL')}</span>
+              </div>
+            )}
+            <button className="reset-week-button" onClick={handleResetWeekCounter}>
+              <RotateCcw size={16} />
+              <span>Resetuj licznik tygodni</span>
+            </button>
           </div>
         </div>
 

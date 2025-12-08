@@ -75,6 +75,7 @@ interface WorkoutStore {
 
   // Utility
   resetProgress: () => void;
+  resetWeekCounter: () => void;
 }
 
 export const useWorkoutStore = create<WorkoutStore>()(
@@ -336,6 +337,14 @@ export const useWorkoutStore = create<WorkoutStore>()(
             currentStreak: 0,
             longestStreak: 0
           }
+        });
+      },
+
+      resetWeekCounter: () => {
+        const monday = getMonday(new Date());
+        set({
+          planStartDate: monday.toISOString(),
+          currentWeek: 0
         });
       }
     }),
