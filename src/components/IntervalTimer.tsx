@@ -63,16 +63,6 @@ export function IntervalTimer({
     }
   };
 
-  const getPhaseTime = (p: Phase): number => {
-    switch (p) {
-      case 'warmup': return 300; // 5 min
-      case 'run': return runTime;
-      case 'walk': return walkTime;
-      case 'cooldown': return 300; // 5 min
-      default: return 0;
-    }
-  };
-
   const nextPhase = useCallback(() => {
     if (phase === 'warmup') {
       setPhase('run');
@@ -106,20 +96,16 @@ export function IntervalTimer({
     }
   }, [phase, currentRound, totalRounds, runTime, walkTime, playSound, vibrate, onComplete]);
 
+  // Timer countdown effect
   useEffect(() => {
     let interval: number | null = null;
 
     if (isRunning && phase !== 'complete') {
       interval = window.setInterval(() => {
         setTimeLeft((prev) => {
-          // Play countdown sounds
+          // Play countdown sounds at 3, 2, 1
           if (prev <= 4 && prev > 1) {
             playSound(700, 0.1);
-          }
-
-          if (prev <= 1) {
-            nextPhase();
-            return getPhaseTime(phase);
           }
           return prev - 1;
         });
@@ -129,7 +115,14 @@ export function IntervalTimer({
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isRunning, phase, nextPhase, playSound]);
+  }, [isRunning, phase, playSound]);
+
+  // Phase transition effect - triggers when timeLeft hits 0
+  useEffect(() => {
+    if (timeLeft <= 0 && isRunning && phase !== 'complete') {
+      nextPhase();
+    }
+  }, [timeLeft, isRunning, phase, nextPhase]);
 
   const handleReset = () => {
     setPhase('warmup');
