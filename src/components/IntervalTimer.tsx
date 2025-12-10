@@ -6,6 +6,7 @@ interface IntervalTimerProps {
   runTime: number; // seconds
   walkTime: number; // seconds
   onComplete: () => void;
+  autoStart?: boolean;
 }
 
 type Phase = 'run' | 'walk' | 'warmup' | 'cooldown' | 'complete';
@@ -14,12 +15,13 @@ export function IntervalTimer({
   totalRounds = 12,
   runTime = 30,
   walkTime = 30,
-  onComplete
+  onComplete,
+  autoStart = true
 }: IntervalTimerProps) {
   const [currentRound, setCurrentRound] = useState(0);
   const [phase, setPhase] = useState<Phase>('warmup');
   const [timeLeft, setTimeLeft] = useState(300); // 5 min warmup
-  const [isRunning, setIsRunning] = useState(false);
+  const [isRunning, setIsRunning] = useState(autoStart);
   const [soundEnabled, setSoundEnabled] = useState(true);
 
   const playSound = useCallback((frequency: number = 800, duration: number = 0.3) => {
