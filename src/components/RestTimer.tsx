@@ -46,35 +46,41 @@ export function RestTimer({ defaultTime, onClose, autoStart = true }: RestTimerP
     }
   }, []);
 
+  // Countdown effect - just decrements timer
   useEffect(() => {
     let interval: number | null = null;
 
     if (isRunning && timeLeft > 0) {
       interval = window.setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            setIsRunning(false);
-            playSound();
-            vibrate();
-            // Auto-close after 1.5 seconds
-            setTimeout(() => {
-              onClose();
-            }, 1500);
-            return 0;
-          }
-          // Play tick sound at 3, 2, 1
-          if (prev <= 4 && prev > 1) {
-            playSound();
-          }
-          return prev - 1;
-        });
+        setTimeLeft((prev) => prev - 1);
       }, 1000);
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isRunning, timeLeft, playSound, vibrate, onClose]);
+  }, [isRunning, timeLeft > 0]); // Only re-run when isRunning changes or when timeLeft transitions to/from 0
+
+  // Countdown sounds effect - plays tick at 3, 2, 1
+  useEffect(() => {
+    if (isRunning && timeLeft > 0 && timeLeft <= 3) {
+      playSound();
+    }
+  }, [timeLeft, isRunning, playSound]);
+
+  // Completion effect - handles when timer reaches 0
+  useEffect(() => {
+    if (timeLeft === 0 && isRunning) {
+      setIsRunning(false);
+      playSound();
+      vibrate();
+      // Auto-close after 1.5 seconds
+      const timeout = setTimeout(() => {
+        onClose();
+      }, 1500);
+      return () => clearTimeout(timeout);
+    }
+  }, [timeLeft, isRunning, playSound, vibrate, onClose]);
 
   const handleReset = () => {
     setTimeLeft(selectedTime);
