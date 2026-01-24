@@ -1,6 +1,7 @@
 import { X, Trophy, Clock, Flame, TrendingUp } from 'lucide-react';
 import { useWorkoutStore } from '../store/workoutStore';
 import { Achievements } from './Achievements';
+import { getWorkoutEmoji } from '../data/schedule';
 
 interface StatsModalProps {
   onClose: () => void;
@@ -9,16 +10,8 @@ interface StatsModalProps {
 export function StatsModal({ onClose }: StatsModalProps) {
   const { stats, completedSessions, schedule } = useWorkoutStore();
 
-  const totalWorkoutsInPlan = schedule
-    .flatMap(w => w.days)
-    .filter(d => d.workoutType !== 'REST')
-    .length;
-
-  const completedWorkouts = schedule
-    .flatMap(w => w.days)
-    .filter(d => d.completed && d.workoutType !== 'REST')
-    .length;
-
+  const totalWorkoutsInPlan = schedule.length;
+  const completedWorkouts = schedule.filter(d => d.completed).length;
   const progressPercentage = Math.round((completedWorkouts / totalWorkoutsInPlan) * 100);
 
   const formatDuration = (minutes: number) => {
@@ -81,7 +74,7 @@ export function StatsModal({ onClose }: StatsModalProps) {
             />
           </div>
           <div className="progress-text">
-            <span>{completedWorkouts} z {totalWorkoutsInPlan} treningów</span>
+            <span>{completedWorkouts} z {totalWorkoutsInPlan} dni</span>
             <span>{progressPercentage}%</span>
           </div>
         </div>
@@ -93,8 +86,8 @@ export function StatsModal({ onClose }: StatsModalProps) {
               {completedSessions.slice(-5).reverse().map(session => (
                 <div key={session.id} className="recent-item">
                   <div className="recent-type">
-                    {session.workoutType === 'AEROBY' ? '🏃' : session.workoutType === 'A' ? '🏋️' : '🤸'}
-                    <span>Trening {session.workoutType}</span>
+                    {getWorkoutEmoji(session.workoutType)}
+                    <span>{session.workoutType.replace('_', ' ')}</span>
                   </div>
                   <div className="recent-date">{new Date(session.date).toLocaleDateString('pl-PL')}</div>
                   <div className="recent-duration">{session.totalDuration} min</div>

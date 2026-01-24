@@ -1,4 +1,4 @@
-export type WorkoutType = 'A' | 'B' | 'AEROBY' | 'REST';
+export type WorkoutType = 'SILA_A' | 'SILA_B' | 'CARDIO_1' | 'CARDIO_2';
 
 export interface Exercise {
   id: string;
@@ -8,8 +8,7 @@ export interface Exercise {
   reps: string;
   restTime: string;
   notes?: string;
-  isSuperset?: boolean;
-  supersetWith?: string;
+  tempo?: string;
 }
 
 export interface Workout {
@@ -22,7 +21,7 @@ export interface Workout {
   exercises: Exercise[];
 }
 
-export interface AerobyOption {
+export interface CardioOption {
   id: string;
   name: string;
   description: string;
@@ -34,17 +33,10 @@ export interface AerobyOption {
 }
 
 export interface DaySchedule {
-  day: string;
-  dayName: string;
+  dayNumber: number;
   workoutType: WorkoutType;
   completed: boolean;
   completedAt?: string;
-  exerciseProgress?: Record<string, ExerciseProgress>;
-}
-
-export interface WeekSchedule {
-  weekNumber: number;
-  days: DaySchedule[];
 }
 
 export interface ExerciseProgress {

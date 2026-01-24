@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type {
-  WeekSchedule,
+  DaySchedule,
   WorkoutSession,
   ExerciseProgress,
   SetProgress,
@@ -9,36 +9,28 @@ import type {
   GoogleFitData,
   WorkoutType
 } from '../types';
-import { generateMonthSchedule } from '../data/schedule';
+import { generateSchedule, getWorkoutForDay } from '../data/schedule';
 
-// Helper to get Monday of current week
-function getMonday(date: Date): Date {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  d.setDate(diff);
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
+// Calculate which day of the plan we're on
+function calculateCurrentDay(planStartDate: string | null): number {
+  if (!planStartDate) return 1;
 
-// Calculate which week of the plan we're in
-function calculateCurrentWeek(planStartDate: string | null): number {
-  if (!planStartDate) return 0;
+  const start = new Date(planStartDate);
+  start.setHours(0, 0, 0, 0);
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
 
-  const start = getMonday(new Date(planStartDate));
-  const now = getMonday(new Date());
   const diffTime = now.getTime() - start.getTime();
-  const diffWeeks = Math.floor(diffTime / (7 * 24 * 60 * 60 * 1000));
+  const diffDays = Math.floor(diffTime / (24 * 60 * 60 * 1000));
 
-  // Keep within 0-3 range (4 weeks), cycle if needed
-  return Math.max(0, Math.min(3, diffWeeks % 4));
+  // Day 1 is the first day
+  return Math.max(1, diffDays + 1);
 }
 
 interface WorkoutStore {
   // Schedule
-  schedule: WeekSchedule[];
-  currentWeek: number;
-  currentDay: number;
+  schedule: DaySchedule[];
+  currentDayNumber: number;
   planStartDate: string | null;
 
   // Active session
@@ -55,9 +47,9 @@ interface WorkoutStore {
 
   // Actions - Schedule
   initializeSchedule: () => void;
-  setCurrentWeek: (week: number) => void;
-  markDayCompleted: (weekIndex: number, dayIndex: number) => void;
-  syncWeekWithDate: () => void;
+  syncDayWithDate: () => void;
+  markDayCompleted: (dayNumber: number) => void;
+  getTodayWorkout: () => WorkoutType;
 
   // Actions - Session
   startSession: (workoutType: WorkoutType) => void;
@@ -75,16 +67,14 @@ interface WorkoutStore {
 
   // Utility
   resetProgress: () => void;
-  resetWeekCounter: () => void;
 }
 
 export const useWorkoutStore = create<WorkoutStore>()(
   persist(
     (set, get) => ({
       // Initial state
-      schedule: generateMonthSchedule(),
-      currentWeek: 0,
-      currentDay: new Date().getDay() === 0 ? 6 : new Date().getDay() - 1,
+      schedule: generateSchedule(28),
+      currentDayNumber: 1,
       planStartDate: null,
       activeSession: null,
       completedSessions: [],
@@ -100,33 +90,40 @@ export const useWorkoutStore = create<WorkoutStore>()(
 
       // Schedule actions
       initializeSchedule: () => {
-        set({ schedule: generateMonthSchedule() });
+        set({ schedule: generateSchedule(28) });
       },
 
-      setCurrentWeek: (week: number) => {
-        set({ currentWeek: week });
-      },
-
-      syncWeekWithDate: () => {
+      syncDayWithDate: () => {
         let { planStartDate } = get();
 
-        // If no start date, set it to this Monday (plan starts now)
+        // If no start date, set it to today (plan starts now)
         if (!planStartDate) {
-          const monday = getMonday(new Date());
-          planStartDate = monday.toISOString();
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          planStartDate = today.toISOString();
           set({ planStartDate });
         }
 
-        const currentWeek = calculateCurrentWeek(planStartDate);
-        const currentDay = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-        set({ currentWeek, currentDay });
+        const currentDayNumber = calculateCurrentDay(planStartDate);
+        set({ currentDayNumber });
       },
 
-      markDayCompleted: (weekIndex: number, dayIndex: number) => {
+      getTodayWorkout: () => {
+        const { currentDayNumber } = get();
+        return getWorkoutForDay(currentDayNumber);
+      },
+
+      markDayCompleted: (dayNumber: number) => {
         const schedule = [...get().schedule];
-        schedule[weekIndex].days[dayIndex].completed = true;
-        schedule[weekIndex].days[dayIndex].completedAt = new Date().toISOString();
-        set({ schedule });
+        const dayIndex = dayNumber - 1;
+        if (dayIndex >= 0 && dayIndex < schedule.length) {
+          schedule[dayIndex] = {
+            ...schedule[dayIndex],
+            completed: true,
+            completedAt: new Date().toISOString()
+          };
+          set({ schedule });
+        }
         get().updateStats();
       },
 
@@ -155,6 +152,10 @@ export const useWorkoutStore = create<WorkoutStore>()(
             endTime,
             totalDuration
           };
+
+          // Mark the current day as completed
+          const currentDayNumber = get().currentDayNumber;
+          get().markDayCompleted(currentDayNumber);
 
           set({
             activeSession: null,
@@ -234,12 +235,12 @@ export const useWorkoutStore = create<WorkoutStore>()(
         const sessions = get().completedSessions;
         const schedule = get().schedule;
 
-        const completedDays = schedule.flatMap(w => w.days).filter(d => d.completed && d.workoutType !== 'REST');
+        const completedDays = schedule.filter(d => d.completed);
 
         let currentStreak = 0;
         let longestStreak = get().stats.longestStreak;
 
-        // Calculate streak (simplified)
+        // Calculate streak based on completed sessions
         const sortedSessions = [...sessions].sort((a, b) =>
           new Date(b.date).getTime() - new Date(a.date).getTime()
         );
@@ -248,13 +249,15 @@ export const useWorkoutStore = create<WorkoutStore>()(
           const today = new Date().toISOString().split('T')[0];
           const lastSession = sortedSessions[0].date;
 
+          // If last session was today or yesterday
           if (lastSession === today ||
-              new Date(lastSession).getTime() >= new Date(today).getTime() - 86400000 * 2) {
+              new Date(lastSession).getTime() >= new Date(today).getTime() - 86400000) {
             currentStreak = 1;
             for (let i = 1; i < sortedSessions.length; i++) {
               const diff = new Date(sortedSessions[i-1].date).getTime() -
                           new Date(sortedSessions[i].date).getTime();
-              if (diff <= 86400000 * 3) { // Allow 3 days gap (rest days)
+              // Max 2 days gap (since we train every day)
+              if (diff <= 86400000 * 2) {
                 currentStreak++;
               } else {
                 break;
@@ -307,8 +310,6 @@ export const useWorkoutStore = create<WorkoutStore>()(
           throw new Error('Cannot sync: session not found or Google Fit not connected');
         }
 
-        // This would normally make an API call to Google Fit
-        // For now, we just mark it as synced
         const sessions = get().completedSessions.map(s =>
           s.id === sessionId ? { ...s, syncedToGoogleFit: true } : s
         );
@@ -324,11 +325,12 @@ export const useWorkoutStore = create<WorkoutStore>()(
 
       // Utility
       resetProgress: () => {
-        const monday = getMonday(new Date());
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
         set({
-          schedule: generateMonthSchedule(),
-          planStartDate: monday.toISOString(),
-          currentWeek: 0,
+          schedule: generateSchedule(28),
+          planStartDate: today.toISOString(),
+          currentDayNumber: 1,
           activeSession: null,
           completedSessions: [],
           stats: {
@@ -338,19 +340,11 @@ export const useWorkoutStore = create<WorkoutStore>()(
             longestStreak: 0
           }
         });
-      },
-
-      resetWeekCounter: () => {
-        const monday = getMonday(new Date());
-        set({
-          planStartDate: monday.toISOString(),
-          currentWeek: 0
-        });
       }
     }),
     {
       name: 'fitness-tracker-storage',
-      version: 1
+      version: 2 // Increment version to force reset for new data structure
     }
   )
 );

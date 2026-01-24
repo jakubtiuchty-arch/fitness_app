@@ -1,166 +1,179 @@
-import type { Workout, AerobyOption } from '../types';
+import type { Workout, CardioOption } from '../types';
 
-export const workoutA: Workout = {
-  id: 'workout-a',
-  type: 'A',
-  name: 'TRENING A',
-  description: 'SIŁA I BAZA',
+export const workoutSilaA: Workout = {
+  id: 'sila-a',
+  type: 'SILA_A',
+  name: 'SIŁA A',
+  description: 'Push & Legs Dominant',
   restBetweenSets: '90-120 sek',
-  tempo: 'Wolne opuszczanie ciężaru (3 sekundy)',
+  tempo: 'Ciężkie wielostawy, praca nad siłą pchającą',
   exercises: [
     {
-      id: 'a1',
+      id: 'sa1',
       name: 'Nogi: Przysiad',
-      description: 'Przysiad z hantlami na barkach lub z kettlem (Goblet Squat)',
+      description: 'Przysiad z hantlami na barkach / Goblet Squat',
       sets: 4,
       reps: '6-8',
       restTime: '90-120 sek',
-      notes: 'Tempo: 3 sek. opuszczanie'
+      tempo: '3-1-0-0',
+      notes: 'Tempo 3 sek. opuszczanie'
     },
     {
-      id: 'a2',
-      name: 'Plecy: Podciąganie',
-      description: 'Podciąganie na drążku (z obciążeniem, jeśli możliwe)',
-      sets: 4,
-      reps: 'MAX lub 6-8',
-      restTime: '90-120 sek',
-      notes: 'Dodaj obciążenie gdy robisz więcej niż 8'
-    },
-    {
-      id: 'a3',
+      id: 'sa2',
       name: 'Klatka: Wyciskanie hantli',
-      description: 'Wyciskanie hantli płasko na ławce',
+      description: 'Wyciskanie hantli płasko (możesz dodać lekki skos dodatni)',
       sets: 4,
       reps: '8-10',
       restTime: '90-120 sek'
     },
     {
-      id: 'a4',
-      name: 'Tył uda/Plecy: Martwy ciąg',
-      description: 'Martwy ciąg klasyczny z hantlami lub kettlami',
+      id: 'sa3',
+      name: 'Plecy: Wiosłowanie',
+      description: 'Wiosłowanie dwoma hantlami w opadzie tułowia (chwyt neutralny)',
       sets: 3,
       reps: '10-12',
-      restTime: '90-120 sek'
+      restTime: '90-120 sek',
+      notes: 'Grubość pleców'
     },
     {
-      id: 'a5',
-      name: 'Barki: Wyciskanie żołnierskie',
-      description: 'Wyciskanie żołnierskie hantli (stojąc)',
-      sets: 3,
-      reps: '8-10',
-      restTime: '90-120 sek'
-    },
-    {
-      id: 'a6',
-      name: 'Brzuch: Unoszenie nóg',
-      description: 'Unoszenie nóg w zwisie na drążku',
-      sets: 3,
-      reps: '10-12',
-      restTime: '90-120 sek'
-    }
-  ]
-};
-
-export const workoutB: Workout = {
-  id: 'workout-b',
-  type: 'B',
-  name: 'TRENING B',
-  description: 'HIPERTROFIA I DETAL',
-  restBetweenSets: '60-90 sek',
-  tempo: 'Skupienie na precyzji ruchu i "pompie" mięśniowej',
-  exercises: [
-    {
-      id: 'b1',
-      name: 'Nogi (Jednonóż): Zakroki/Bułgarski',
-      description: 'Zakroki z hantlami lub Bułgarski przysiad',
-      sets: 3,
-      reps: '10 na nogę',
-      restTime: '60-90 sek',
-      notes: 'Wykonaj wszystkie powtórzenia na jedną nogę, potem zmień'
-    },
-    {
-      id: 'b2',
-      name: 'Plecy: Wiosłowanie hantlem',
-      description: 'Wiosłowanie hantlem w oparciu o ławkę',
-      sets: 3,
-      reps: '10-12 na rękę',
-      restTime: '60-90 sek'
-    },
-    {
-      id: 'b3',
-      name: 'Klatka: Wyciskanie na piłce/Pompki',
-      description: 'Wyciskanie hantli leżąc na piłce (dla stabilizacji) lub pompki na poręczach/uchwytach',
+      id: 'sa4',
+      name: 'Barki: Wznosy bokiem',
+      description: 'Wznosy hantli bokiem stojąc',
       sets: 3,
       reps: '12-15',
       restTime: '60-90 sek'
     },
     {
-      id: 'b4',
-      name: 'Barki (Bok): Wznosy bokiem',
-      description: 'Wznosy hantli bokiem stojąc',
-      sets: 3,
-      reps: '15',
-      restTime: '60-90 sek'
-    },
-    {
-      id: 'b5',
-      name: 'Dwugłowe: Uginanie nóg',
-      description: 'Uginanie nóg leżąc przodem na ławce (z hantlem między stopami)',
+      id: 'sa5',
+      name: 'Triceps: Wyciskanie francuskie',
+      description: 'Wyciskanie francuskie hantla oburącz (siedząc lub stojąc)',
       sets: 3,
       reps: '10-12',
       restTime: '60-90 sek'
     },
     {
-      id: 'b6',
-      name: 'Biceps/Triceps (Superseria)',
-      description: 'Uginanie ramion z hantlami + Wyciskanie francuskie hantla (siedząc lub leżąc)',
+      id: 'sa6',
+      name: 'Core: Spacer Farmera',
+      description: 'Spacer Farmera z jednym hantlem (stabilizacja antyrotacyjna)',
       sets: 3,
-      reps: '10+10',
-      restTime: '60-90 sek',
-      isSuperset: true,
-      notes: 'Wykonaj oba ćwiczenia bez przerwy'
+      reps: '40s na stronę',
+      restTime: '60 sek',
+      notes: 'Trzymaj hantel w jednej ręce, utrzymuj prosty tułów'
     }
   ]
 };
 
-export const aerobyOptions: AerobyOption[] = [
+export const workoutSilaB: Workout = {
+  id: 'sila-b',
+  type: 'SILA_B',
+  name: 'SIŁA B',
+  description: 'Pull & Hinge Dominant',
+  restBetweenSets: '90-120 sek',
+  tempo: 'Łańcuch tylny, praca nad siłą ciągnącą i stabilizacją',
+  exercises: [
+    {
+      id: 'sb1',
+      name: 'Tył uda/Plecy: RDL',
+      description: 'Martwy ciąg na prostych nogach (RDL) z hantlami/kettlami',
+      sets: 4,
+      reps: '8-10',
+      restTime: '90-120 sek',
+      notes: 'Powoli w dół!'
+    },
+    {
+      id: 'sb2',
+      name: 'Plecy: Podciąganie',
+      description: 'Podciąganie na drążku (szeroki lub neutralny chwyt)',
+      sets: 4,
+      reps: 'MAX lub 6 z ciężarem',
+      restTime: '90-120 sek',
+      notes: 'Szerokość pleców'
+    },
+    {
+      id: 'sb3',
+      name: 'Barki: Wyciskanie żołnierskie',
+      description: 'Wyciskanie żołnierskie hantli (stojąc – angażuje też brzuch)',
+      sets: 3,
+      reps: '8-10',
+      restTime: '90-120 sek'
+    },
+    {
+      id: 'sb4',
+      name: 'Nogi: Wykroki chodzone',
+      description: 'Walking Lunges z hantlami',
+      sets: 3,
+      reps: '12 kroków/nogę',
+      restTime: '90 sek',
+      notes: 'Uzupełnienie nóg'
+    },
+    {
+      id: 'sb5',
+      name: 'Dwugłowe: Uginanie nóg',
+      description: 'Uginanie nóg leżąc na ławce (z hantlem między stopami)',
+      sets: 3,
+      reps: '10-12',
+      restTime: '60-90 sek',
+      notes: 'Izolacja'
+    },
+    {
+      id: 'sb6',
+      name: 'Biceps: Uginanie z supinacją',
+      description: 'Uginanie ramion z hantlami z supinacją (skrętem nadgarstka)',
+      sets: 3,
+      reps: '10-12',
+      restTime: '60-90 sek'
+    }
+  ]
+};
+
+export const cardioOptions: CardioOption[] = [
   {
-    id: 'interval',
-    name: 'Opcja 1: Interwał',
-    description: 'Wysoka intensywność - dla maksymalnego spalania',
+    id: 'hiit',
+    name: 'CARDIO 1: Interwały (HIIT)',
+    description: 'Budowa progu beztlenowego, dynamika. Bardzo obciążający trening.',
     phases: [
       {
         name: 'Rozgrzewka',
-        duration: '5-10 min',
-        description: 'Trucht'
+        duration: '10 min',
+        description: 'Trucht + krążenia ramion'
       },
       {
         name: 'Praca właściwa',
-        duration: '10-12 serii',
-        description: '30 sek. szybkiego biegu (90% mocy) / 30 sek. marszu'
+        duration: '8-10 serii',
+        description: '45 sek. SZYBKO (90% HRmax) / 45 sek. TRUCHT'
       },
       {
         name: 'Schłodzenie',
-        duration: '5 min',
-        description: 'Marsz'
+        duration: '5-10 min',
+        description: 'Marsz/trucht'
       }
     ]
   },
   {
-    id: 'steady',
-    name: 'Opcja 2: Cardio stałe tętno',
-    description: 'Umiarkowana intensywność - budowanie wytrzymałości',
+    id: 'liss',
+    name: 'CARDIO 2: Bieg ciągły (LISS)',
+    description: 'Budowa bazy tlenowej, spalanie, aktywna regeneracja.',
     phases: [
       {
-        name: 'Bieg ciągły',
-        duration: '40-45 min',
-        description: 'Umiarkowane tempo, tętno ok. 130-145 uderzeń/min'
+        name: 'Opcja A: Baza',
+        duration: '45-60 min',
+        description: 'Tempo konwersacyjne (65-70% HRmax). Nudne, ale buduje "silnik".'
+      },
+      {
+        name: 'Opcja B: BNP',
+        duration: '40 min',
+        description: 'Bieg z narastającą prędkością. Co 10 min +0.5-1 km/h. Ostatnie 10 min mocne.'
       }
     ]
   }
 ];
 
 export const workouts: Record<string, Workout> = {
-  A: workoutA,
-  B: workoutB
+  SILA_A: workoutSilaA,
+  SILA_B: workoutSilaB
+};
+
+// Helper do pobrania opisu cardio
+export const getCardioOption = (type: 'CARDIO_1' | 'CARDIO_2'): CardioOption => {
+  return type === 'CARDIO_1' ? cardioOptions[0] : cardioOptions[1];
 };

@@ -3,9 +3,9 @@ import { useState, useEffect } from 'react';
 import type { WorkoutType, ExerciseProgress } from '../types';
 import { workouts } from '../data/workouts';
 import { ExerciseCard } from './ExerciseCard';
-import { AerobyView } from './AerobyView';
+import { CardioView } from './CardioView';
 import { useWorkoutStore } from '../store/workoutStore';
-import { getWorkoutEmoji } from '../data/schedule';
+import { getWorkoutEmoji, isCardioWorkout } from '../data/schedule';
 
 interface WorkoutViewProps {
   workoutType: WorkoutType;
@@ -18,7 +18,7 @@ export function WorkoutView({ workoutType, onBack, onComplete }: WorkoutViewProp
   const [elapsed, setElapsed] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
 
-  const workout = workoutType === 'A' || workoutType === 'B' ? workouts[workoutType] : null;
+  const workout = workoutType === 'SILA_A' || workoutType === 'SILA_B' ? workouts[workoutType] : null;
 
   useEffect(() => {
     let interval: number | null = null;
@@ -57,9 +57,11 @@ export function WorkoutView({ workoutType, onBack, onComplete }: WorkoutViewProp
     return activeSession?.exercises.find(e => e.exerciseId === exerciseId);
   };
 
-  if (workoutType === 'AEROBY') {
+  // Cardio workouts use CardioView
+  if (isCardioWorkout(workoutType)) {
     return (
-      <AerobyView
+      <CardioView
+        cardioType={workoutType as 'CARDIO_1' | 'CARDIO_2'}
         onBack={onBack}
         activeSession={activeSession}
         onStart={handleStart}

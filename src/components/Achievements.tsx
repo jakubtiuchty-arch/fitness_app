@@ -14,7 +14,7 @@ interface AchievementStats {
   longestStreak: number;
   totalDuration: number;
   completedSessions: number;
-  workoutTypes: { A: number; B: number; AEROBY: number };
+  workoutTypes: { SILA_A: number; SILA_B: number; CARDIO_1: number; CARDIO_2: number };
 }
 
 const achievements: Achievement[] = [
@@ -40,32 +40,39 @@ const achievements: Achievement[] = [
     check: (stats) => stats.currentStreak >= 5 || stats.longestStreak >= 5
   },
   {
-    id: 'week-complete',
-    name: 'Tydzień za nami',
+    id: 'streak-7',
+    name: 'Tydzień perfekcji',
     icon: '📅',
-    description: 'Ukończ 4 treningi w tygodniu',
-    check: (stats) => stats.totalWorkouts >= 4
+    description: '7 treningów z rzędu (cały tydzień)',
+    check: (stats) => stats.currentStreak >= 7 || stats.longestStreak >= 7
   },
   {
-    id: 'strength-master',
-    name: 'Siłacz',
+    id: 'push-master',
+    name: 'Push Master',
     icon: '🏋️',
-    description: 'Ukończ 5 treningów siłowych (A)',
-    check: (stats) => stats.workoutTypes.A >= 5
+    description: 'Ukończ 5 treningów Siła A',
+    check: (stats) => stats.workoutTypes.SILA_A >= 5
   },
   {
-    id: 'hypertrophy-master',
-    name: 'Rzeźbiarz',
+    id: 'pull-master',
+    name: 'Pull Master',
     icon: '💪',
-    description: 'Ukończ 5 treningów hipertrofii (B)',
-    check: (stats) => stats.workoutTypes.B >= 5
+    description: 'Ukończ 5 treningów Siła B',
+    check: (stats) => stats.workoutTypes.SILA_B >= 5
   },
   {
-    id: 'cardio-master',
-    name: 'Maratończyk',
+    id: 'hiit-warrior',
+    name: 'HIIT Warrior',
+    icon: '🔥',
+    description: 'Ukończ 5 treningów HIIT',
+    check: (stats) => stats.workoutTypes.CARDIO_1 >= 5
+  },
+  {
+    id: 'endurance-runner',
+    name: 'Wytrzymały',
     icon: '🏃',
-    description: 'Ukończ 5 treningów cardio',
-    check: (stats) => stats.workoutTypes.AEROBY >= 5
+    description: 'Ukończ 5 treningów LISS',
+    check: (stats) => stats.workoutTypes.CARDIO_2 >= 5
   },
   {
     id: 'hour-warrior',
@@ -78,29 +85,22 @@ const achievements: Achievement[] = [
     id: 'dedicated',
     name: 'Oddany',
     icon: '🏆',
-    description: 'Ukończ 10 treningów',
-    check: (stats) => stats.totalWorkouts >= 10
+    description: 'Ukończ 14 treningów (2 tygodnie)',
+    check: (stats) => stats.totalWorkouts >= 14
   },
   {
     id: 'month-complete',
     name: 'Miesiąc mocy',
     icon: '🌟',
-    description: 'Ukończ cały miesięczny plan',
-    check: (stats) => stats.totalWorkouts >= 16
+    description: 'Ukończ 28 treningów (miesiąc)',
+    check: (stats) => stats.totalWorkouts >= 28
   },
   {
-    id: 'streak-10',
+    id: 'streak-14',
     name: 'Legenda',
     icon: '👑',
-    description: '10 treningów z rzędu',
-    check: (stats) => stats.currentStreak >= 10 || stats.longestStreak >= 10
-  },
-  {
-    id: 'three-hours',
-    name: 'Czas to mięśnie',
-    icon: '💎',
-    description: 'Spędź łącznie 3 godziny na treningu',
-    check: (stats) => stats.totalDuration >= 180
+    description: '14 treningów z rzędu',
+    check: (stats) => stats.currentStreak >= 14 || stats.longestStreak >= 14
   }
 ];
 
@@ -110,12 +110,13 @@ export function Achievements() {
   // Calculate workout type counts
   const workoutTypes = completedSessions.reduce(
     (acc, session) => {
-      if (session.workoutType === 'A') acc.A++;
-      else if (session.workoutType === 'B') acc.B++;
-      else if (session.workoutType === 'AEROBY') acc.AEROBY++;
+      if (session.workoutType === 'SILA_A') acc.SILA_A++;
+      else if (session.workoutType === 'SILA_B') acc.SILA_B++;
+      else if (session.workoutType === 'CARDIO_1') acc.CARDIO_1++;
+      else if (session.workoutType === 'CARDIO_2') acc.CARDIO_2++;
       return acc;
     },
-    { A: 0, B: 0, AEROBY: 0 }
+    { SILA_A: 0, SILA_B: 0, CARDIO_1: 0, CARDIO_2: 0 }
   );
 
   const achievementStats: AchievementStats = {

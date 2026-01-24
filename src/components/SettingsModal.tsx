@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Trash2, CloudOff, Check, RotateCcw } from 'lucide-react';
+import { X, Trash2, CloudOff, Check } from 'lucide-react';
 import { useWorkoutStore } from '../store/workoutStore';
 import { GoogleFitButton } from './GoogleFitButton';
 import { ConfirmModal } from './ConfirmModal';
@@ -8,20 +8,14 @@ interface SettingsModalProps {
   onClose: () => void;
 }
 
-type ConfirmAction = 'resetProgress' | 'resetWeek' | null;
-
 export function SettingsModal({ onClose }: SettingsModalProps) {
-  const { googleFit, resetProgress, resetWeekCounter, disconnectGoogleFit, currentWeek, planStartDate } = useWorkoutStore();
-  const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
+  const { googleFit, resetProgress, disconnectGoogleFit, currentDayNumber, planStartDate } = useWorkoutStore();
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
-  const handleConfirm = () => {
-    if (confirmAction === 'resetProgress') {
-      resetProgress();
-      onClose();
-    } else if (confirmAction === 'resetWeek') {
-      resetWeekCounter();
-    }
-    setConfirmAction(null);
+  const handleResetConfirm = () => {
+    resetProgress();
+    setShowResetConfirm(false);
+    onClose();
   };
 
   return (
@@ -67,27 +61,31 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
           <div className="settings-section">
             <h3>Plan treningowy</h3>
             <p className="settings-description">
-              Aktualnie używasz planu "Full Body + Aeroby - 1 miesiąc".
+              Plan przygotowawczy do sezonu - codzienna rotacja.
             </p>
             <div className="plan-info">
               <div className="plan-item">
-                <span>Trening A:</span>
-                <span>Siła i baza (6 ćwiczeń)</span>
+                <span>Siła A:</span>
+                <span>Push & Legs (6 ćwiczeń)</span>
               </div>
               <div className="plan-item">
-                <span>Trening B:</span>
-                <span>Hipertrofia i detal (6 ćwiczeń)</span>
+                <span>Cardio 1:</span>
+                <span>HIIT Interwały 45s/45s</span>
               </div>
               <div className="plan-item">
-                <span>Aeroby:</span>
-                <span>Interwały lub stałe tempo</span>
+                <span>Siła B:</span>
+                <span>Pull & Hinge (6 ćwiczeń)</span>
+              </div>
+              <div className="plan-item">
+                <span>Cardio 2:</span>
+                <span>LISS Bieg ciągły 45-60 min</span>
               </div>
             </div>
 
             <div className="week-counter-section">
               <div className="plan-item">
-                <span>Aktualny tydzień:</span>
-                <span>Tydzień {currentWeek + 1}</span>
+                <span>Aktualny dzień:</span>
+                <span>Dzień {currentDayNumber}</span>
               </div>
               {planStartDate && (
                 <div className="plan-item">
@@ -95,51 +93,36 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                   <span>{new Date(planStartDate).toLocaleDateString('pl-PL')}</span>
                 </div>
               )}
-              <button className="reset-week-button" onClick={() => setConfirmAction('resetWeek')}>
-                <RotateCcw size={16} />
-                <span>Resetuj licznik tygodni</span>
-              </button>
             </div>
           </div>
 
           <div className="settings-section danger">
             <h3>Strefa niebezpieczna</h3>
             <p className="settings-description">
-              Zresetuj cały postęp i zacznij od nowa.
+              Zresetuj cały postęp i zacznij od Dnia 1.
             </p>
-            <button className="danger-button" onClick={() => setConfirmAction('resetProgress')}>
+            <button className="danger-button" onClick={() => setShowResetConfirm(true)}>
               <Trash2 size={18} />
               <span>Resetuj postęp</span>
             </button>
           </div>
 
           <div className="settings-footer">
-            <p>FitTrack v1.0.0</p>
-            <p>Stworzono z myślą o Twoich celach</p>
+            <p>FitTrack v2.0.0</p>
+            <p>Plan przygotowawczy do sezonu</p>
           </div>
         </div>
       </div>
 
       <ConfirmModal
-        isOpen={confirmAction === 'resetWeek'}
-        title="Resetuj licznik tygodni"
-        message="Ten tydzień stanie się Tygodniem 1. Twoje statystyki i historia treningów pozostaną nienaruszone."
-        confirmText="Resetuj"
-        cancelText="Anuluj"
-        variant="warning"
-        onConfirm={handleConfirm}
-        onCancel={() => setConfirmAction(null)}
-      />
-
-      <ConfirmModal
-        isOpen={confirmAction === 'resetProgress'}
+        isOpen={showResetConfirm}
         title="Resetuj cały postęp"
-        message="Czy na pewno chcesz zresetować cały postęp? Ta operacja jest nieodwracalna. Wszystkie statystyki, historia treningów i ustawienia zostaną usunięte."
+        message="Czy na pewno chcesz zresetować cały postęp? Zaczniesz od Dnia 1. Ta operacja jest nieodwracalna."
         confirmText="Tak, resetuj wszystko"
         cancelText="Anuluj"
         variant="danger"
-        onConfirm={handleConfirm}
-        onCancel={() => setConfirmAction(null)}
+        onConfirm={handleResetConfirm}
+        onCancel={() => setShowResetConfirm(false)}
       />
     </>
   );

@@ -70,7 +70,6 @@ export function ExerciseCard({
             <h3 className="exercise-name">{exercise.name}</h3>
             <p className="exercise-sets">
               {exercise.sets} x {exercise.reps}
-              {exercise.isSuperset && <span className="superset-badge">Superseria</span>}
             </p>
           </div>
           <div className="exercise-status">

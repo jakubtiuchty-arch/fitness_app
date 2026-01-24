@@ -1637,3 +1637,312 @@
 .confirm-modal-btn.confirm.info:hover {
   background-color: #4f46e5;
 }
+
+/* Daily Rotation UI */
+.day-counter {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.day-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.rotation-info {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+/* Today's Workout Card */
+.today-workout-card {
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 2px solid transparent;
+}
+
+.today-workout-card.strength {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, var(--bg-card) 100%);
+}
+
+.today-workout-card.cardio {
+  border-color: var(--success);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, var(--bg-card) 100%);
+}
+
+.today-workout-card.completed {
+  opacity: 0.7;
+  border-color: var(--text-muted);
+}
+
+.today-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.today-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--primary);
+}
+
+.completed-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--success);
+  background: rgba(34, 197, 94, 0.15);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+}
+
+.today-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.workout-emoji-large {
+  font-size: 3rem;
+}
+
+.workout-info h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.workout-info p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0;
+}
+
+.start-workout-btn {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.start-workout-btn:hover {
+  background: #4f46e5;
+  transform: translateY(-1px);
+}
+
+/* Schedule Section */
+.schedule-section {
+  margin-bottom: 1.5rem;
+}
+
+.schedule-section h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.75rem;
+}
+
+.mini-schedule {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.mini-day {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  min-width: 60px;
+  border: 1px solid var(--border);
+}
+
+.mini-day.strength {
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.mini-day.cardio {
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.mini-day.completed {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: var(--success);
+}
+
+.mini-day.missed {
+  opacity: 0.5;
+}
+
+.mini-day-number {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.mini-emoji {
+  font-size: 1.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.mini-label {
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Workout Type Colors */
+.workout-sila-a {
+  background-color: #6366f1;
+}
+
+.workout-sila-b {
+  background-color: #8b5cf6;
+}
+
+.workout-cardio-1 {
+  background-color: #ef4444;
+}
+
+.workout-cardio-2 {
+  background-color: #22c55e;
+}
+
+/* Cardio View */
+.cardio-view.hiit .workout-view-header {
+  border-bottom-color: rgba(239, 68, 68, 0.3);
+}
+
+.cardio-view.liss .workout-view-header {
+  border-bottom-color: rgba(34, 197, 94, 0.3);
+}
+
+.cardio-phases {
+  padding: 1rem;
+}
+
+.cardio-description {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.cardio-description p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.phase-card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.phase-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.phase-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--primary);
+  border-radius: 10px;
+}
+
+.hiit .phase-icon {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.liss .phase-icon {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.phase-title h4 {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.phase-duration {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.phase-description {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.cardio-tip {
+  padding: 1rem;
+  border-radius: 12px;
+  margin-top: 1rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.cardio-tip.warning {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+}
+
+.cardio-tip.info {
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: var(--primary);
+}
+
+.cardio-target-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.target-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}

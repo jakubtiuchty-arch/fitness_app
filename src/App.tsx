@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import {
   Header,
-  WeekSelector,
-  DayCard,
   WorkoutView,
   StatsModal,
   SettingsModal
 } from './components';
 import { useWorkoutStore } from './store/workoutStore';
+import { getWorkoutLabel, getWorkoutSubtitle, getWorkoutEmoji, isStrengthWorkout } from './data/schedule';
 import type { WorkoutType } from './types';
 import './App.css';
 
@@ -16,41 +15,29 @@ type View = 'schedule' | 'workout';
 function App() {
   const {
     schedule,
-    currentWeek,
-    currentDay,
-    setCurrentWeek,
-    markDayCompleted,
-    syncWeekWithDate
+    currentDayNumber,
+    syncDayWithDate,
+    getTodayWorkout
   } = useWorkoutStore();
 
   const [view, setView] = useState<View>('schedule');
-  const [selectedWorkout, setSelectedWorkout] = useState<{
-    type: WorkoutType;
-    weekIndex: number;
-    dayIndex: number;
-  } | null>(null);
+  const [selectedWorkout, setSelectedWorkout] = useState<WorkoutType | null>(null);
   const [showStats, setShowStats] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
-  // Sync week with current date on app load
+  // Sync day with current date on app load
   useEffect(() => {
-    syncWeekWithDate();
-  }, [syncWeekWithDate]);
+    syncDayWithDate();
+  }, [syncDayWithDate]);
 
-  const handleStartWorkout = (weekIndex: number, dayIndex: number, type: WorkoutType) => {
-    setSelectedWorkout({ type, weekIndex, dayIndex });
-    setView('workout');
-  };
+  const todayWorkout = getTodayWorkout();
 
-  const handleViewWorkout = (weekIndex: number, dayIndex: number, type: WorkoutType) => {
-    setSelectedWorkout({ type, weekIndex, dayIndex });
+  const handleStartWorkout = (type: WorkoutType) => {
+    setSelectedWorkout(type);
     setView('workout');
   };
 
   const handleWorkoutComplete = () => {
-    if (selectedWorkout) {
-      markDayCompleted(selectedWorkout.weekIndex, selectedWorkout.dayIndex);
-    }
     setView('schedule');
     setSelectedWorkout(null);
   };
@@ -63,12 +50,20 @@ function App() {
   if (view === 'workout' && selectedWorkout) {
     return (
       <WorkoutView
-        workoutType={selectedWorkout.type}
+        workoutType={selectedWorkout}
         onBack={handleBack}
         onComplete={handleWorkoutComplete}
       />
     );
   }
+
+  // Get upcoming days (next 6 days after today)
+  const upcomingDays = schedule.slice(currentDayNumber, currentDayNumber + 6);
+  // Get recent days (last 3 completed)
+  const recentDays = schedule.slice(Math.max(0, currentDayNumber - 4), currentDayNumber - 1).reverse();
+
+  const todaySchedule = schedule[currentDayNumber - 1];
+  const isCompleted = todaySchedule?.completed;
 
   return (
     <div className="app">
@@ -78,46 +73,93 @@ function App() {
       />
 
       <main className="main-content">
-        <WeekSelector
-          currentWeek={currentWeek}
-          totalWeeks={schedule.length}
-          onWeekChange={setCurrentWeek}
-        />
-
-        <div className="schedule-info">
-          <p>System rotacyjny - co drugi dzień trening</p>
+        <div className="day-counter">
+          <span className="day-number">Dzień {currentDayNumber}</span>
+          <span className="rotation-info">Plan przygotowawczy do sezonu</span>
         </div>
 
-        <div className="days-grid">
-          {schedule[currentWeek]?.days.map((day, dayIndex) => (
-            <DayCard
-              key={`${currentWeek}-${dayIndex}`}
-              day={day}
-              isToday={dayIndex === currentDay}
-              onStartWorkout={() => handleStartWorkout(currentWeek, dayIndex, day.workoutType)}
-              onViewWorkout={() => handleViewWorkout(currentWeek, dayIndex, day.workoutType)}
-            />
-          ))}
+        {/* Today's Workout - Prominent Card */}
+        <div className={`today-workout-card ${isStrengthWorkout(todayWorkout) ? 'strength' : 'cardio'} ${isCompleted ? 'completed' : ''}`}>
+          <div className="today-header">
+            <span className="today-label">DZISIAJ</span>
+            {isCompleted && <span className="completed-badge">✓ Ukończone</span>}
+          </div>
+
+          <div className="today-content">
+            <div className="workout-emoji-large">{getWorkoutEmoji(todayWorkout)}</div>
+            <div className="workout-info">
+              <h2>{getWorkoutLabel(todayWorkout)}</h2>
+              <p>{getWorkoutSubtitle(todayWorkout)}</p>
+            </div>
+          </div>
+
+          {!isCompleted && (
+            <button
+              className="start-workout-btn"
+              onClick={() => handleStartWorkout(todayWorkout)}
+            >
+              Rozpocznij trening
+            </button>
+          )}
         </div>
 
+        {/* Upcoming Days */}
+        {upcomingDays.length > 0 && (
+          <div className="schedule-section">
+            <h3>Nadchodzące</h3>
+            <div className="mini-schedule">
+              {upcomingDays.map((day) => (
+                <div
+                  key={day.dayNumber}
+                  className={`mini-day ${isStrengthWorkout(day.workoutType) ? 'strength' : 'cardio'}`}
+                >
+                  <span className="mini-day-number">D{day.dayNumber}</span>
+                  <span className="mini-emoji">{getWorkoutEmoji(day.workoutType)}</span>
+                  <span className="mini-label">{getWorkoutLabel(day.workoutType).split(' ')[0]}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Recent Days */}
+        {recentDays.length > 0 && (
+          <div className="schedule-section">
+            <h3>Ostatnie treningi</h3>
+            <div className="mini-schedule">
+              {recentDays.map((day) => (
+                <div
+                  key={day.dayNumber}
+                  className={`mini-day ${day.completed ? 'completed' : 'missed'}`}
+                >
+                  <span className="mini-day-number">D{day.dayNumber}</span>
+                  <span className="mini-emoji">{day.completed ? '✓' : '✗'}</span>
+                  <span className="mini-label">{getWorkoutLabel(day.workoutType).split(' ')[0]}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Legend */}
         <div className="legend">
-          <h3>Legenda</h3>
+          <h3>Rotacja</h3>
           <div className="legend-items">
             <div className="legend-item">
-              <span className="legend-color bg-blue-600"></span>
-              <span>Trening A - Siła i baza</span>
+              <span className="legend-color workout-sila-a"></span>
+              <span>Siła A - Push & Legs</span>
             </div>
             <div className="legend-item">
-              <span className="legend-color bg-purple-600"></span>
-              <span>Trening B - Hipertrofia</span>
+              <span className="legend-color workout-cardio-1"></span>
+              <span>Cardio 1 - HIIT Interwały</span>
             </div>
             <div className="legend-item">
-              <span className="legend-color bg-green-600"></span>
-              <span>Aeroby - Cardio</span>
+              <span className="legend-color workout-sila-b"></span>
+              <span>Siła B - Pull & Hinge</span>
             </div>
             <div className="legend-item">
-              <span className="legend-color bg-slate-700"></span>
-              <span>Wolne - Regeneracja</span>
+              <span className="legend-color workout-cardio-2"></span>
+              <span>Cardio 2 - LISS Bieg ciągły</span>
             </div>
           </div>
         </div>

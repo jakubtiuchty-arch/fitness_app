@@ -1,9 +1,7 @@
 export { Header } from './Header';
-export { WeekSelector } from './WeekSelector';
-export { DayCard } from './DayCard';
 export { WorkoutView } from './WorkoutView';
 export { ExerciseCard } from './ExerciseCard';
-export { AerobyView } from './AerobyView';
+export { CardioView } from './CardioView';
 export { StatsModal } from './StatsModal';
 export { SettingsModal } from './SettingsModal';
 export { GoogleFitButton } from './GoogleFitButton';
