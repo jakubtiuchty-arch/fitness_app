@@ -108,12 +108,12 @@ export const workoutSilaB: Workout = {
     },
     {
       id: 'sb5',
-      name: 'Dwugłowe: Uginanie nóg',
-      description: 'Uginanie nóg leżąc na ławce (z hantlem między stopami)',
+      name: 'Pośladki/Dwugłowe: Hip Thrust',
+      description: 'Hip Thrust z hantlem na biodrach (plecy oparte o ławkę)',
       sets: 3,
       reps: '10-12',
       restTime: '60-90 sek',
-      notes: 'Izolacja'
+      notes: 'Ściskaj pośladki na górze, 2 sek. pauza'
     },
     {
       id: 'sb6',
