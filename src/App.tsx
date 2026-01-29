@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   Header,
   WorkoutView,
@@ -16,12 +17,12 @@ function App() {
   const {
     schedule,
     currentDayNumber,
-    syncDayWithDate,
-    getTodayWorkout
+    syncDayWithDate
   } = useWorkoutStore();
 
   const [view, setView] = useState<View>('schedule');
   const [selectedWorkout, setSelectedWorkout] = useState<WorkoutType | null>(null);
+  const [selectedDay, setSelectedDay] = useState<number>(1);
   const [showStats, setShowStats] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
@@ -30,7 +31,15 @@ function App() {
     syncDayWithDate();
   }, [syncDayWithDate]);
 
-  const todayWorkout = getTodayWorkout();
+  // Set selected day to current day on load
+  useEffect(() => {
+    setSelectedDay(currentDayNumber);
+  }, [currentDayNumber]);
+
+  const selectedSchedule = schedule[selectedDay - 1];
+  const selectedWorkoutType = selectedSchedule?.workoutType;
+  const isToday = selectedDay === currentDayNumber;
+  const isCompleted = selectedSchedule?.completed;
 
   const handleStartWorkout = (type: WorkoutType) => {
     setSelectedWorkout(type);
@@ -47,6 +56,14 @@ function App() {
     setSelectedWorkout(null);
   };
 
+  const handlePrevDay = () => {
+    setSelectedDay(d => Math.max(1, d - 1));
+  };
+
+  const handleNextDay = () => {
+    setSelectedDay(d => Math.min(schedule.length, d + 1));
+  };
+
   if (view === 'workout' && selectedWorkout) {
     return (
       <WorkoutView
@@ -57,13 +74,10 @@ function App() {
     );
   }
 
-  // Get upcoming days (next 6 days after today)
-  const upcomingDays = schedule.slice(currentDayNumber, currentDayNumber + 6);
-  // Get recent days (last 3 completed)
-  const recentDays = schedule.slice(Math.max(0, currentDayNumber - 4), currentDayNumber - 1).reverse();
-
-  const todaySchedule = schedule[currentDayNumber - 1];
-  const isCompleted = todaySchedule?.completed;
+  // Get visible days for the selector (7 days centered on selected)
+  const selectorStart = Math.max(0, selectedDay - 4);
+  const selectorEnd = Math.min(schedule.length, selectorStart + 7);
+  const visibleDays = schedule.slice(selectorStart, selectorEnd);
 
   return (
     <div className="app">
@@ -74,70 +88,67 @@ function App() {
 
       <main className="main-content">
         <div className="day-counter">
-          <span className="day-number">Dzień {currentDayNumber}</span>
           <span className="rotation-info">Plan przygotowawczy do sezonu</span>
         </div>
 
-        {/* Today's Workout - Prominent Card */}
-        <div className={`today-workout-card ${isStrengthWorkout(todayWorkout) ? 'strength' : 'cardio'} ${isCompleted ? 'completed' : ''}`}>
-          <div className="today-header">
-            <span className="today-label">DZISIAJ</span>
-            {isCompleted && <span className="completed-badge">✓ Ukończone</span>}
+        {/* Day Navigator */}
+        <div className="day-navigator">
+          <button
+            className="day-nav-btn"
+            onClick={handlePrevDay}
+            disabled={selectedDay <= 1}
+          >
+            <ChevronLeft size={24} />
+          </button>
+
+          <div className="day-selector">
+            {visibleDays.map((day) => (
+              <button
+                key={day.dayNumber}
+                className={`day-pill ${day.dayNumber === selectedDay ? 'selected' : ''} ${day.dayNumber === currentDayNumber ? 'today' : ''} ${day.completed ? 'done' : ''} ${isStrengthWorkout(day.workoutType) ? 'strength' : 'cardio'}`}
+                onClick={() => setSelectedDay(day.dayNumber)}
+              >
+                <span className="pill-number">{day.dayNumber}</span>
+                <span className="pill-emoji">{getWorkoutEmoji(day.workoutType)}</span>
+              </button>
+            ))}
           </div>
 
-          <div className="today-content">
-            <div className="workout-emoji-large">{getWorkoutEmoji(todayWorkout)}</div>
-            <div className="workout-info">
-              <h2>{getWorkoutLabel(todayWorkout)}</h2>
-              <p>{getWorkoutSubtitle(todayWorkout)}</p>
-            </div>
-          </div>
-
-          {!isCompleted && (
-            <button
-              className="start-workout-btn"
-              onClick={() => handleStartWorkout(todayWorkout)}
-            >
-              Rozpocznij trening
-            </button>
-          )}
+          <button
+            className="day-nav-btn"
+            onClick={handleNextDay}
+            disabled={selectedDay >= schedule.length}
+          >
+            <ChevronRight size={24} />
+          </button>
         </div>
 
-        {/* Upcoming Days */}
-        {upcomingDays.length > 0 && (
-          <div className="schedule-section">
-            <h3>Nadchodzące</h3>
-            <div className="mini-schedule">
-              {upcomingDays.map((day) => (
-                <div
-                  key={day.dayNumber}
-                  className={`mini-day ${isStrengthWorkout(day.workoutType) ? 'strength' : 'cardio'}`}
-                >
-                  <span className="mini-day-number">D{day.dayNumber}</span>
-                  <span className="mini-emoji">{getWorkoutEmoji(day.workoutType)}</span>
-                  <span className="mini-label">{getWorkoutLabel(day.workoutType).split(' ')[0]}</span>
-                </div>
-              ))}
+        {/* Selected Day's Workout Card */}
+        {selectedWorkoutType && (
+          <div className={`today-workout-card ${isStrengthWorkout(selectedWorkoutType) ? 'strength' : 'cardio'} ${isCompleted ? 'completed' : ''}`}>
+            <div className="today-header">
+              <span className="today-label">
+                {isToday ? 'DZISIAJ' : `DZIEŃ ${selectedDay}`}
+              </span>
+              {isCompleted && <span className="completed-badge">✓ Ukończone</span>}
             </div>
-          </div>
-        )}
 
-        {/* Recent Days */}
-        {recentDays.length > 0 && (
-          <div className="schedule-section">
-            <h3>Ostatnie treningi</h3>
-            <div className="mini-schedule">
-              {recentDays.map((day) => (
-                <div
-                  key={day.dayNumber}
-                  className={`mini-day ${day.completed ? 'completed' : 'missed'}`}
-                >
-                  <span className="mini-day-number">D{day.dayNumber}</span>
-                  <span className="mini-emoji">{day.completed ? '✓' : '✗'}</span>
-                  <span className="mini-label">{getWorkoutLabel(day.workoutType).split(' ')[0]}</span>
-                </div>
-              ))}
+            <div className="today-content">
+              <div className="workout-emoji-large">{getWorkoutEmoji(selectedWorkoutType)}</div>
+              <div className="workout-info">
+                <h2>{getWorkoutLabel(selectedWorkoutType)}</h2>
+                <p>{getWorkoutSubtitle(selectedWorkoutType)}</p>
+              </div>
             </div>
+
+            {!isCompleted && (
+              <button
+                className="start-workout-btn"
+                onClick={() => handleStartWorkout(selectedWorkoutType)}
+              >
+                Rozpocznij trening
+              </button>
+            )}
           </div>
         )}
 
