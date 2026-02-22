@@ -144,66 +144,92 @@ export function IntervalTimer({
   };
 
   return (
-    <div className="interval-timer">
-      <div className="interval-timer-header">
+    <div className="bg-ios-card rounded-[32px] p-6 shadow-ios border border-ios-gray4/50 relative overflow-hidden">
+      {/* Kolorowe tło zależne od fazy (blur) */}
+      <div className={`absolute -top-20 -right-20 w-64 h-64 rounded-full blur-[80px] opacity-20 transition-colors duration-1000 ${
+        phase === 'run' ? 'bg-[#FF453A]' : 
+        phase === 'walk' ? 'bg-[#A8F000]' : 
+        phase === 'warmup' ? 'bg-[#FF9F0A]' : 'bg-[#0A84FF]'
+      }`}></div>
+
+      <div className="flex justify-between items-center mb-6 relative z-10">
+        <span className={`text-sm font-bold tracking-widest uppercase px-3 py-1 rounded-full ${
+          phase === 'run' ? 'bg-[#FF453A]/20 text-[#FF453A]' : 
+          phase === 'walk' ? 'bg-[#A8F000]/20 text-[#A8F000]' : 
+          phase === 'warmup' ? 'bg-[#FF9F0A]/20 text-[#FF9F0A]' : 'bg-[#0A84FF]/20 text-[#0A84FF]'
+        }`}>
+          {getPhaseLabel(phase)}
+        </span>
         <button
-          className="timer-icon-btn"
+          className="w-10 h-10 flex items-center justify-center rounded-full bg-ios-gray4/50 text-ios-gray hover:text-white transition-colors active:scale-95"
           onClick={() => setSoundEnabled(!soundEnabled)}
         >
           {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
         </button>
       </div>
 
-      <div className={`interval-timer-phase ${phase}`}>
-        {getPhaseLabel(phase)}
-      </div>
-
-      <div className="interval-timer-time">
-        {formatTime(timeLeft)}
-      </div>
-
-      {phase !== 'warmup' && phase !== 'cooldown' && phase !== 'complete' && (
-        <div className="interval-timer-round">
-          Runda {currentRound} z {totalRounds}
+      <div className="text-center mb-8 relative z-10">
+        <div className={`text-7xl font-black tracking-tighter font-mono mb-2 transition-colors duration-300 ${
+          phase === 'run' ? 'text-[#FF453A]' : 
+          phase === 'walk' ? 'text-[#A8F000]' : 'text-white'
+        }`}>
+          {formatTime(timeLeft)}
         </div>
-      )}
-
-      <div className="interval-timer-progress">
-        {Array.from({ length: totalRounds }).map((_, i) => (
-          <div
-            key={i}
-            className={`interval-dot ${
-              i < currentRound - 1 ? 'completed' :
-              i === currentRound - 1 && phase === 'walk' ? 'completed' :
-              i === currentRound - 1 ? 'current' : ''
-            }`}
-          />
-        ))}
+        
+        {phase !== 'warmup' && phase !== 'cooldown' && phase !== 'complete' && (
+          <div className="text-ios-gray font-medium">
+            Runda <span className="text-white font-bold">{currentRound}</span> z {totalRounds}
+          </div>
+        )}
       </div>
 
-      <div className="rest-timer-actions">
-        <button className="timer-action-btn" onClick={handleReset}>
-          <RotateCcw size={20} />
+      <div className="flex flex-wrap justify-center gap-2 mb-8 relative z-10">
+        {Array.from({ length: totalRounds }).map((_, i) => {
+          const isCompleted = i < currentRound - 1 || (i === currentRound - 1 && phase === 'walk');
+          const isCurrent = i === currentRound - 1 && phase === 'run';
+          
+          return (
+            <div
+              key={i}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                isCompleted ? 'w-4 bg-[#A8F000]' :
+                isCurrent ? 'w-8 bg-[#FF453A] animate-pulse' : 'w-2 bg-ios-gray4'
+              }`}
+            />
+          );
+        })}
+      </div>
+
+      <div className="flex items-center justify-center gap-6 relative z-10">
+        <button 
+          className="w-14 h-14 flex items-center justify-center rounded-full bg-ios-gray4/50 text-ios-gray hover:text-white transition-colors active:scale-90" 
+          onClick={handleReset}
+        >
+          <RotateCcw size={24} />
         </button>
         <button
-          className="timer-action-btn primary"
+          className={`w-20 h-20 flex items-center justify-center rounded-full transition-all active:scale-90 ${
+            isRunning 
+              ? 'bg-ios-gray4 text-white' 
+              : 'bg-[#A8F000] text-black shadow-[0_0_20px_rgba(168,240,0,0.4)]'
+          }`}
           onClick={() => setIsRunning(!isRunning)}
           disabled={phase === 'complete'}
         >
-          {isRunning ? <Pause size={24} /> : <Play size={24} />}
+          {isRunning ? <Pause size={32} className="fill-current" /> : <Play size={32} className="fill-current ml-1" />}
         </button>
-        <button
-          className="timer-action-btn skip"
+        <button 
+          className="w-14 h-14 flex items-center justify-center rounded-full bg-ios-gray4/50 text-ios-gray hover:text-white transition-colors active:scale-90" 
           onClick={handleSkipPhase}
           disabled={phase === 'complete'}
         >
-          Pomiń
+          <span className="text-xs font-bold uppercase tracking-wider">Pomiń</span>
         </button>
       </div>
 
       {phase === 'complete' && (
-        <div className="timer-complete">
-          Świetna robota! Interwały ukończone!
+        <div className="mt-6 p-4 bg-[#A8F000]/20 rounded-2xl text-center text-[#A8F000] font-bold animate-pulse relative z-10">
+          Świetna robota! Interwały ukończone! 🎉
         </div>
       )}
     </div>

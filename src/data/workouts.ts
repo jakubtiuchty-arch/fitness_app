@@ -148,23 +148,6 @@ export const cardioOptions: CardioOption[] = [
         description: 'Marsz/trucht'
       }
     ]
-  },
-  {
-    id: 'liss',
-    name: 'CARDIO 2: Bieg ciągły (LISS)',
-    description: 'Budowa bazy tlenowej, spalanie, aktywna regeneracja.',
-    phases: [
-      {
-        name: 'Opcja A: Baza',
-        duration: '45-60 min',
-        description: 'Tempo konwersacyjne (65-70% HRmax). Nudne, ale buduje "silnik".'
-      },
-      {
-        name: 'Opcja B: BNP',
-        duration: '40 min',
-        description: 'Bieg z narastającą prędkością. Co 10 min +0.5-1 km/h. Ostatnie 10 min mocne.'
-      }
-    ]
   }
 ];
 
@@ -174,6 +157,6 @@ export const workouts: Record<string, Workout> = {
 };
 
 // Helper do pobrania opisu cardio
-export const getCardioOption = (type: 'CARDIO_1' | 'CARDIO_2'): CardioOption => {
-  return type === 'CARDIO_1' ? cardioOptions[0] : cardioOptions[1];
+export const getCardioOption = (): CardioOption => {
+  return cardioOptions[0];
 };

@@ -1,4 +1,4 @@
-export type WorkoutType = 'SILA_A' | 'SILA_B' | 'CARDIO_1' | 'CARDIO_2';
+export type WorkoutType = 'SILA_A' | 'SILA_B' | 'CARDIO_1';
 
 export interface Exercise {
   id: string;

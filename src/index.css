@@ -1,85 +1,46 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-ios-bg text-white font-sans antialiased;
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
+/* Ukrywanie paska przewijania (scrollbar) dla kontenerów z klasą .scrollbar-hide */
+@layer utilities {
+  .scrollbar-hide {
+    /* IE and Edge */
+    -ms-overflow-style: none;
+    /* Firefox */
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Wciąż zostawiam stare zmienne na czas przejściowy, 
+żeby nie "zepsuć" elementów, które nie są jeszcze przepisane */
 :root {
-  --primary: #3b82f6;
-  --primary-dark: #2563eb;
-  --secondary: #8b5cf6;
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --bg-dark: #0f172a;
-  --bg-card: #1e293b;
-  --bg-card-hover: #334155;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --border: #334155;
+  --primary: #A8F000; /* Zmiana na Neon Green */
+  --primary-dark: #8bcc00;
+  --secondary: #5E5CE6;
+  --success: #32D74B;
+  --warning: #FF9F0A;
+  --danger: #FF453A;
+  --bg-dark: #000000; /* Zmiana na iOS Black */
+  --bg-card: #1C1C1E; /* Zmiana na iOS Card Black */
+  --bg-card-hover: #2C2C2E;
+  --text-primary: #FFFFFF;
+  --text-secondary: #8E8E93;
+  --text-muted: #636366;
+  --border: #3A3A3C;
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-  --radius: 12px;
-  --radius-sm: 8px;
-}
-
-html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  color: var(--text-primary);
-  background-color: var(--bg-dark);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-  min-height: 100vh;
-  min-height: 100dvh;
-}
-
-#root {
-  min-height: 100vh;
-  min-height: 100dvh;
-}
-
-button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  background: none;
-  color: inherit;
-}
-
-input {
-  font-family: inherit;
-  border: none;
-  background: none;
-  color: inherit;
-}
-
-input:focus {
-  outline: none;
-}
-
-/* Utility classes */
-.bg-blue-600 {
-  background-color: #2563eb;
-}
-
-.bg-purple-600 {
-  background-color: #7c3aed;
-}
-
-.bg-green-600 {
-  background-color: #16a34a;
-}
-
-.bg-slate-700 {
-  background-color: #334155;
-}
-
-.bg-slate-600 {
-  background-color: #475569;
+  --radius: 16px; /* Zwiększone zaokrąglenie w stylu iOS */
+  --radius-sm: 10px;
 }

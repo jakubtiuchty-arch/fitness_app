@@ -61,7 +61,7 @@ export function WorkoutView({ workoutType, onBack, onComplete }: WorkoutViewProp
   if (isCardioWorkout(workoutType)) {
     return (
       <CardioView
-        cardioType={workoutType as 'CARDIO_1' | 'CARDIO_2'}
+        cardioType={workoutType as 'CARDIO_1'}
         onBack={onBack}
         activeSession={activeSession}
         onStart={handleStart}
@@ -77,68 +77,107 @@ export function WorkoutView({ workoutType, onBack, onComplete }: WorkoutViewProp
   if (!workout) return null;
 
   return (
-    <div className="workout-view">
-      <div className="workout-view-header">
-        <button className="back-button" onClick={onBack}>
-          <ArrowLeft size={24} />
-        </button>
-        <div className="workout-title">
-          <span className="workout-emoji">{getWorkoutEmoji(workoutType)}</span>
-          <div>
-            <h2>{workout.name}</h2>
-            <p>{workout.description}</p>
+    <div className="min-h-screen bg-ios-bg pb-32">
+      {/* IOS Sticky Header */}
+      <div className="sticky top-0 z-40 bg-ios-bg/90 backdrop-blur-xl border-b border-ios-gray4">
+        <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+          <button 
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-ios-gray4/50 text-ios-primary active:scale-95 transition-transform" 
+            onClick={onBack}
+          >
+            <ArrowLeft size={22} />
+          </button>
+          
+          <div className="flex-1 text-center">
+            <span className="text-xs font-semibold text-ios-primary uppercase tracking-widest block">
+              {workout.name}
+            </span>
+            <span className="text-sm text-ios-gray font-medium">
+              {getWorkoutEmoji(workoutType)} {workout.description}
+            </span>
           </div>
+
+          <div className="w-10"></div> {/* Spacer for centering */}
         </div>
       </div>
 
-      <div className="workout-meta">
-        <div className="meta-item">
-          <Clock size={18} />
-          <span>Przerwy: {workout.restBetweenSets}</span>
+      <div className="max-w-md mx-auto p-4 flex flex-col gap-6">
+        {/* Workout Meta Info */}
+        <div className="flex gap-3 pb-2 w-full">
+          <div className="flex items-center gap-2 bg-ios-card px-4 py-3 rounded-2xl border border-ios-gray4/50 w-auto whitespace-nowrap">
+            <Clock size={18} className="text-ios-gray shrink-0" />
+            <div>
+              <p className="text-[10px] text-ios-gray uppercase font-bold tracking-wider">Przerwy</p>
+              <p className="text-sm text-white font-medium">{workout.restBetweenSets}</p>
+            </div>
+          </div>
+          {workout.tempo && (
+            <div className="flex items-center gap-2 bg-ios-card px-4 py-3 rounded-2xl border border-ios-gray4/50 flex-1 min-w-0">
+              <Timer size={18} className="text-ios-gray shrink-0" />
+              <div className="min-w-0">
+                <p className="text-[10px] text-ios-gray uppercase font-bold tracking-wider">Tempo</p>
+                <p className="text-sm text-white font-medium truncate">{workout.tempo}</p>
+              </div>
+            </div>
+          )}
         </div>
-        {workout.tempo && (
-          <div className="meta-item">
-            <Timer size={18} />
-            <span>{workout.tempo}</span>
+
+        {/* Global Workout Timer */}
+        {activeSession && (
+          <div className="bg-ios-primary/10 border border-ios-primary/20 rounded-3xl p-6 flex flex-col items-center justify-center relative overflow-hidden shadow-[0_0_30px_rgba(168,240,0,0.1)]">
+            <span className="text-ios-primary text-xs font-bold tracking-widest uppercase mb-1">
+              Czas Treningu
+            </span>
+            <div className="text-5xl font-black text-white tracking-tight font-mono mb-4">
+              {formatTime(elapsed)}
+            </div>
+            <button 
+              className={`w-14 h-14 rounded-full flex items-center justify-center transition-transform active:scale-90 ${isRunning ? 'bg-ios-gray4 text-white' : 'bg-ios-primary text-black'}`}
+              onClick={handlePause}
+            >
+              {isRunning ? <Pause size={24} className="fill-current" /> : <Play size={24} className="fill-current ml-1" />}
+            </button>
           </div>
         )}
-      </div>
 
-      {activeSession && (
-        <div className="session-timer">
-          <div className="timer-display">{formatTime(elapsed)}</div>
-          <button className="timer-button" onClick={handlePause}>
-            {isRunning ? <Pause size={20} /> : <Play size={20} />}
-          </button>
+        {/* Lista ćwiczeń */}
+        <div className="flex flex-col gap-4">
+          <h3 className="text-lg font-bold text-white mb-2 ml-1">Ćwiczenia</h3>
+          {workout.exercises.map((exercise, index) => (
+            <ExerciseCard
+              key={exercise.id}
+              exercise={exercise}
+              index={index + 1}
+              progress={getExerciseProgress(exercise.id)}
+              isActive={!!activeSession}
+              onCompleteSet={(setIndex, data) => completeSet(exercise.id, setIndex, data)}
+              onUpdateProgress={(progress) => updateExerciseProgress(exercise.id, progress)}
+            />
+          ))}
         </div>
-      )}
-
-      <div className="exercises-list">
-        {workout.exercises.map((exercise, index) => (
-          <ExerciseCard
-            key={exercise.id}
-            exercise={exercise}
-            index={index + 1}
-            progress={getExerciseProgress(exercise.id)}
-            isActive={!!activeSession}
-            onCompleteSet={(setIndex, data) => completeSet(exercise.id, setIndex, data)}
-            onUpdateProgress={(progress) => updateExerciseProgress(exercise.id, progress)}
-          />
-        ))}
       </div>
 
-      <div className="workout-actions">
-        {!activeSession ? (
-          <button className="primary-button" onClick={handleStart}>
-            <Play size={20} />
-            <span>Rozpocznij trening</span>
-          </button>
-        ) : (
-          <button className="finish-button" onClick={handleFinish}>
-            <Check size={20} />
-            <span>Zakończ trening</span>
-          </button>
-        )}
+      {/* Pływający pasek akcji na dole */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-ios-glass backdrop-blur-xl border-t border-ios-gray4/50 pb-safe z-50">
+        <div className="max-w-md mx-auto">
+          {!activeSession ? (
+            <button 
+              className="w-full bg-[#A8F000] hover:bg-[#8bcc00] text-black font-bold text-lg py-4 rounded-2xl flex items-center justify-center gap-2 transition-transform active:scale-95 !opacity-100 shadow-[0_0_20px_rgba(168,240,0,0.3)]"
+              onClick={handleStart}
+            >
+              <Play size={24} className="fill-current" />
+              <span>Rozpocznij Trening</span>
+            </button>
+          ) : (
+            <button 
+              className="w-full bg-ios-card hover:bg-ios-gray4 text-white font-bold text-lg py-4 rounded-2xl flex items-center justify-center gap-2 transition-transform active:scale-95 border border-ios-primary/50 text-ios-primary"
+              onClick={handleFinish}
+            >
+              <Check size={24} strokeWidth={3} />
+              <span>Zakończ Trening</span>
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

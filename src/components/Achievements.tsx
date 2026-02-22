@@ -14,7 +14,7 @@ interface AchievementStats {
   longestStreak: number;
   totalDuration: number;
   completedSessions: number;
-  workoutTypes: { SILA_A: number; SILA_B: number; CARDIO_1: number; CARDIO_2: number };
+  workoutTypes: { SILA_A: number; SILA_B: number; CARDIO_1: number };
 }
 
 const achievements: Achievement[] = [
@@ -68,11 +68,11 @@ const achievements: Achievement[] = [
     check: (stats) => stats.workoutTypes.CARDIO_1 >= 5
   },
   {
-    id: 'endurance-runner',
-    name: 'Wytrzymały',
-    icon: '🏃',
-    description: 'Ukończ 5 treningów LISS',
-    check: (stats) => stats.workoutTypes.CARDIO_2 >= 5
+    id: 'hiit-master',
+    name: 'Mistrz HIIT',
+    icon: '⚡',
+    description: 'Ukończ 10 treningów HIIT',
+    check: (stats) => stats.workoutTypes.CARDIO_1 >= 10
   },
   {
     id: 'hour-warrior',
@@ -113,10 +113,9 @@ export function Achievements() {
       if (session.workoutType === 'SILA_A') acc.SILA_A++;
       else if (session.workoutType === 'SILA_B') acc.SILA_B++;
       else if (session.workoutType === 'CARDIO_1') acc.CARDIO_1++;
-      else if (session.workoutType === 'CARDIO_2') acc.CARDIO_2++;
       return acc;
     },
-    { SILA_A: 0, SILA_B: 0, CARDIO_1: 0, CARDIO_2: 0 }
+    { SILA_A: 0, SILA_B: 0, CARDIO_1: 0 }
   );
 
   const achievementStats: AchievementStats = {

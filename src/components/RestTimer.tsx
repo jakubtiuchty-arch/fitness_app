@@ -102,57 +102,87 @@ export function RestTimer({ defaultTime, onClose, autoStart = true }: RestTimerP
   const progress = ((selectedTime - timeLeft) / selectedTime) * 100;
 
   return (
-    <div className="rest-timer-overlay">
-      <div className="rest-timer-modal">
-        <div className="rest-timer-header">
-          <h3>Przerwa</h3>
-          <div className="rest-timer-controls">
+    <div className="fixed inset-0 z-[100] flex flex-col justify-end pointer-events-none">
+      {/* Ciemne tło */}
+      <div 
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-auto transition-opacity duration-300"
+        onClick={onClose}
+      />
+
+      {/* Wyjeżdżający modal od dołu */}
+      <div className="relative bg-ios-card rounded-t-[32px] p-6 pb-safe w-full max-w-md mx-auto pointer-events-auto shadow-[0_-10px_40px_rgba(0,0,0,0.5)] transform transition-transform duration-300 translate-y-0">
+        
+        {/* Wskaźnik przeciągnięcia (pigułka) */}
+        <div className="w-12 h-1.5 bg-ios-gray4 rounded-full mx-auto mb-6 opacity-50"></div>
+
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="text-xl font-bold text-white tracking-tight">Przerwa</h3>
+          <div className="flex gap-2">
             <button
-              className="timer-icon-btn"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-ios-gray4/50 text-ios-gray hover:text-white transition-colors active:scale-95"
               onClick={() => setSoundEnabled(!soundEnabled)}
               aria-label={soundEnabled ? 'Wyłącz dźwięk' : 'Włącz dźwięk'}
             >
               {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
             </button>
-            <button className="timer-icon-btn" onClick={onClose} aria-label="Zamknij">
+            <button 
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-ios-gray4/50 text-ios-gray hover:text-white transition-colors active:scale-95" 
+              onClick={onClose} 
+              aria-label="Zamknij"
+            >
               <X size={20} />
             </button>
           </div>
         </div>
 
-        <div className="rest-timer-display">
-          <svg className="timer-circle" viewBox="0 0 100 100">
-            <circle
-              className="timer-circle-bg"
-              cx="50"
-              cy="50"
-              r="45"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="6"
-            />
-            <circle
-              className="timer-circle-progress"
-              cx="50"
-              cy="50"
-              r="45"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="6"
-              strokeLinecap="round"
-              strokeDasharray={`${2 * Math.PI * 45}`}
-              strokeDashoffset={`${2 * Math.PI * 45 * (1 - progress / 100)}`}
-              transform="rotate(-90 50 50)"
-            />
-          </svg>
-          <div className="timer-time">{formatTime(timeLeft)}</div>
+        <div className="flex flex-col items-center justify-center mb-8">
+          <div className="relative w-48 h-48 flex items-center justify-center">
+            {/* SVG Ring */}
+            <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
+              <circle
+                className="text-ios-gray4/30"
+                cx="50"
+                cy="50"
+                r="46"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="6"
+              />
+              <circle
+                className="text-ios-primary transition-all duration-1000 ease-linear"
+                cx="50"
+                cy="50"
+                r="46"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="6"
+                strokeLinecap="round"
+                strokeDasharray={`${2 * Math.PI * 46}`}
+                strokeDashoffset={`${2 * Math.PI * 46 * (progress / 100)}`}
+              />
+            </svg>
+            
+            {/* Czas w środku */}
+            <div className="text-6xl font-black text-white tracking-tighter font-mono z-10">
+              {formatTime(timeLeft)}
+            </div>
+            
+            {/* Glow effect */}
+            {isRunning && (
+              <div className="absolute inset-0 bg-ios-primary/20 blur-2xl rounded-full opacity-30 animate-pulse"></div>
+            )}
+          </div>
         </div>
 
-        <div className="rest-timer-presets">
+        <div className="flex justify-center gap-3 mb-8">
           {presetTimes.map((time) => (
             <button
               key={time}
-              className={`preset-btn ${selectedTime === time ? 'active' : ''}`}
+              className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all active:scale-95 ${
+                selectedTime === time 
+                  ? 'bg-ios-primary text-black shadow-[0_0_15px_rgba(168,240,0,0.3)]' 
+                  : 'bg-ios-gray4/50 text-ios-gray hover:text-white hover:bg-ios-gray4'
+              }`}
               onClick={() => handleSelectTime(time)}
             >
               {time}s
@@ -160,24 +190,32 @@ export function RestTimer({ defaultTime, onClose, autoStart = true }: RestTimerP
           ))}
         </div>
 
-        <div className="rest-timer-actions">
-          <button className="timer-action-btn" onClick={handleReset}>
-            <RotateCcw size={20} />
+        <div className="flex items-center justify-center gap-6 mb-4">
+          <button 
+            className="w-14 h-14 flex items-center justify-center rounded-full bg-ios-gray4/50 text-ios-gray hover:text-white transition-colors active:scale-90" 
+            onClick={handleReset}
+          >
+            <RotateCcw size={24} />
           </button>
           <button
-            className="timer-action-btn primary"
+            className={`w-20 h-20 flex items-center justify-center rounded-full transition-all active:scale-90 ${
+              isRunning ? 'bg-ios-gray4 text-white' : 'bg-ios-primary text-black shadow-[0_0_20px_rgba(168,240,0,0.4)]'
+            }`}
             onClick={() => setIsRunning(!isRunning)}
           >
-            {isRunning ? <Pause size={24} /> : <Play size={24} />}
+            {isRunning ? <Pause size={32} className="fill-current" /> : <Play size={32} className="fill-current ml-1" />}
           </button>
-          <button className="timer-action-btn skip" onClick={onClose}>
-            Pomiń
+          <button 
+            className="w-14 h-14 flex items-center justify-center rounded-full bg-ios-gray4/50 text-ios-gray hover:text-white transition-colors active:scale-90" 
+            onClick={onClose}
+          >
+            <span className="text-xs font-bold uppercase tracking-wider">Pomiń</span>
           </button>
         </div>
 
         {timeLeft === 0 && (
-          <div className="timer-complete">
-            Czas na kolejną serię!
+          <div className="text-center text-ios-primary font-bold animate-pulse mt-4">
+            Czas na kolejną serię! 🔥
           </div>
         )}
       </div>
