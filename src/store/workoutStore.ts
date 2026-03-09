@@ -12,7 +12,7 @@ import type {
 import { generateSchedule, getWorkoutForDay } from '../data/schedule';
 
 // Calculate which day of the plan we're on
-function calculateCurrentDay(planStartDate: string | null): number {
+function calculateCurrentDay(planStartDate: string | null, scheduleLength: number = 28): number {
   if (!planStartDate) return 1;
 
   const start = new Date(planStartDate);
@@ -23,8 +23,9 @@ function calculateCurrentDay(planStartDate: string | null): number {
   const diffTime = now.getTime() - start.getTime();
   const diffDays = Math.floor(diffTime / (24 * 60 * 60 * 1000));
 
-  // Day 1 is the first day
-  return Math.max(1, diffDays + 1);
+  // Cycle within schedule length (wraps around after 28 days)
+  const day = (diffDays % scheduleLength) + 1;
+  return Math.max(1, Math.min(day, scheduleLength));
 }
 
 interface WorkoutStore {
@@ -94,7 +95,7 @@ export const useWorkoutStore = create<WorkoutStore>()(
       },
 
       syncDayWithDate: () => {
-        let { planStartDate } = get();
+        let { planStartDate, activeSession } = get();
 
         // If no start date, set it to today (plan starts now)
         if (!planStartDate) {
@@ -104,7 +105,15 @@ export const useWorkoutStore = create<WorkoutStore>()(
           set({ planStartDate });
         }
 
-        const currentDayNumber = calculateCurrentDay(planStartDate);
+        // Clear stale active sessions (older than 4 hours)
+        if (activeSession) {
+          const sessionAge = Date.now() - new Date(activeSession.startTime).getTime();
+          if (sessionAge > 4 * 60 * 60 * 1000) {
+            set({ activeSession: null });
+          }
+        }
+
+        const currentDayNumber = calculateCurrentDay(planStartDate, get().schedule.length);
         set({ currentDayNumber });
       },
 
